@@ -1,1 +1,21 @@
-<%= @inner_content %>
+<div class="fixed inset-0 bg-zinc-800">
+  <div class="absolute inset-2 flex bg-zinc-950 border border-zinc-700 rounded-lg">
+    <.sidebar>
+      <.sidebar_option
+        text="Home"
+        icon="hero-home"
+        icon_selected="hero-home-solid"
+        selected={@domain == :home}
+      />
+      <.sidebar_option
+        text="DMs"
+        icon="hero-chat-bubble-left-right"
+        icon_selected="hero-chat-bubble-left-right-solid"
+        selected={@domain == :direct_messages}
+      />
+    </.sidebar>
+    <div class="flex-1">
+      <%= @inner_content %>
+    </div>
+  </div>
+</div>

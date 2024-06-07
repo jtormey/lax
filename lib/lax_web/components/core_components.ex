@@ -431,10 +431,10 @@ defmodule LaxWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h1 class="text-lg font-semibold leading-none text-white truncate">
           <%= render_slot(@inner_block) %>
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
+        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-200">
           <%= render_slot(@subtitle) %>
         </p>
       </div>
@@ -591,7 +591,7 @@ defmodule LaxWeb.CoreComponents do
       <.icon name="hero-arrow-path" class="ml-1 w-3 h-3 animate-spin" />
   """
   attr :name, :string, required: true
-  attr :class, :string, default: nil
+  attr :class, :any, default: nil
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
