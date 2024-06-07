@@ -19,7 +19,7 @@ const ResizeContainer = {
   },
 
   pushResize(width) {
-    this.pushEvent(this.el.dataset["phx-resize"] || "resize", { width });
+    this.pushEvent(this.el.getAttribute("phx-resize") || "resize", { width });
   },
 
   onMouseover(event) {
@@ -50,9 +50,11 @@ const ResizeContainer = {
     const dx = this.mouseX - event.x;
     this.mouseX = event.x;
 
-    const width = this.el.getBoundingClientRect().width - dx;
-    this.el.style.width = `${width}px`;
+    let width = this.el.getBoundingClientRect().width - dx;
+    width = Math.min(width, parseInt(this.el.dataset["maxWidth"]))
+    width = Math.max(width, parseInt(this.el.dataset["minWidth"]))
 
+    this.el.style.width = `${width}px`;
     this.pushResize(width);
   },
 

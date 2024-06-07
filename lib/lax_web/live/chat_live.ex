@@ -6,9 +6,7 @@ defmodule LaxWeb.ChatLive do
 
   def render(assigns) do
     ~H"""
-    <.container sidebar_width={
-      if user = @current_user, do: user.ui_settings.channels_sidebar_width, else: 250
-    }>
+    <.container sidebar_width={sidebar_width(@current_user)}>
       <:sidebar>
         <.sidebar_header />
         <.sidebar>
@@ -76,7 +74,12 @@ defmodule LaxWeb.ChatLive do
     {:noreply, put_form(socket)}
   end
 
+  ## Helpers
+
   def put_form(socket, value \\ %{}) do
     assign(socket, :chat_form, to_form(value, as: :chat))
   end
+
+  def sidebar_width(nil), do: 250
+  def sidebar_width(current_user), do: current_user.ui_settings.channels_sidebar_width
 end

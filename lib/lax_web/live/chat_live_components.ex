@@ -11,6 +11,8 @@ defmodule LaxWeb.ChatLiveComponents do
       <div
         id="sidebar_resizeable"
         phx-hook="ResizeContainer"
+        data-min-width={128}
+        data-max-width={512}
         style={"width:#{@sidebar_width}px;"}
         class="resize-container-right border-r border-zinc-700 flex flex-col"
       >
@@ -75,7 +77,9 @@ defmodule LaxWeb.ChatLiveComponents do
 
     ~H"""
     <.item_button {assigns}>
-      <.icon name="hero-hashtag" class={["size-4", @text_class]} />
+      <div class="w-4">
+        <.icon name="hero-hashtag" class={["size-4", @text_class]} />
+      </div>
       <span class={["text-sm truncate", @text_class]}><%= @name %></span>
     </.item_button>
     """
