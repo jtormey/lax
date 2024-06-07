@@ -350,19 +350,28 @@ defmodule LaxWeb.CoreComponents do
   def input(%{type: "textarea"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
-      <textarea
-        id={@id}
-        name={@name}
-        class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          "min-h-[6rem] phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
-        ]}
-        {@rest}
-      ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.label :if={@label} for={@id}><%= @label %></.label>
+      <div class={[
+        "rounded-lg border overflow-hidden",
+        "phx-no-feedback:border-zinc-600 phx-no-feedback:focus-within:border-zinc-500",
+        @label != nil && "mt-2",
+        @errors == [] && "border-zinc-600 focus-within:border-zinc-500",
+        @errors != [] && "border-rose-400 focus-within:border-rose-400"
+      ]}>
+        <div class="bg-zinc-800">
+          <textarea
+            id={@id}
+            name={@name}
+            rows={1}
+            class="block w-full bg-zinc-800 border-none rounded-t-lg text-zinc-300 focus:ring-0 sm:text-sm sm:leading-6 resize-none"
+            {@rest}
+          ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
+          <%= render_slot(@inner_block) %>
+        </div>
+        <div :if={@errors != []} class="py-1 px-2 border-t border-dashed border-rose-400">
+          <.error :for={msg <- @errors} size={:xs}><%= msg %></.error>
+        </div>
+      </div>
     </div>
     """
   end
@@ -407,12 +416,21 @@ defmodule LaxWeb.CoreComponents do
   @doc """
   Generates a generic error message.
   """
+  attr :size, :atom, values: [:xs, :sm], default: :sm
   slot :inner_block, required: true
 
   def error(assigns) do
+    {class, icon_class} =
+      case assigns.size do
+        :xs -> {"gap-1 text-xs leading-4", "h-4 w-4"}
+        :sm -> {"gap-3 text-sm leading-6 mt-3", "h-5 w-5"}
+      end
+
+    assigns = assign(assigns, class: class, icon_class: icon_class)
+
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+    <p class={[@class, "flex items-center text-rose-600 phx-no-feedback:hidden"]}>
+      <.icon name="hero-exclamation-circle-mini" class={@icon_class} />
       <%= render_slot(@inner_block) %>
     </p>
     """
