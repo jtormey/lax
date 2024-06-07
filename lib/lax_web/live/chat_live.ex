@@ -9,12 +9,23 @@ defmodule LaxWeb.ChatLive do
       <:sidebar>
         <.sidebar_header />
         <.sidebar>
-          <.sidebar_subheader>
-            Channels
-          </.sidebar_subheader>
-          <.channel_item name="office-austin" />
-          <.channel_item name="office-new-york" selected />
-          <.channel_item name="office-sf" active />
+          <.sidebar_section>
+            <.sidebar_subheader>
+              Channels
+            </.sidebar_subheader>
+            <.channel_item name="office-austin" />
+            <.channel_item name="office-new-york" selected />
+            <.channel_item name="office-sf" active />
+          </.sidebar_section>
+
+          <.sidebar_section>
+            <.sidebar_subheader>
+              Direct messages
+            </.sidebar_subheader>
+            <.dm_item username="justin" />
+            <.dm_item username="blaine" online active />
+            <.dm_item username="ramon" unread_count={3} />
+          </.sidebar_section>
         </.sidebar>
       </:sidebar>
 

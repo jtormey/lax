@@ -41,6 +41,16 @@ defmodule LaxWeb.ChatLiveComponents do
     """
   end
 
+  slot :inner_block, required: true
+
+  def sidebar_section(assigns) do
+    ~H"""
+    <div class="mb-4">
+      <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
   slot :actions, default: []
   slot :inner_block, required: true
 
@@ -61,28 +71,67 @@ defmodule LaxWeb.ChatLiveComponents do
   attr :rest, :global, include: ~w(phx-click phx-target)
 
   def channel_item(assigns) do
-    text_class =
-      if assigns.selected or assigns.active do
-        "text-white"
-      else
-        "text-zinc-400 group-hover:text-white"
-      end
+    assigns = assign(assigns, :text_class, text_class(assigns))
 
-    assigns = assign(assigns, :text_class, text_class)
+    ~H"""
+    <.item_button {assigns}>
+      <.icon name="hero-hashtag" class={["size-4", @text_class]} />
+      <span class={["text-sm truncate", @text_class]}><%= @name %></span>
+    </.item_button>
+    """
+  end
 
+  attr :username, :string, required: true
+  attr :selected, :boolean, default: false
+  attr :active, :boolean, default: false
+  attr :online, :boolean, default: false
+  attr :unread_count, :integer, default: 0
+  attr :rest, :global, include: ~w(phx-click phx-target)
+
+  def dm_item(assigns) do
+    assigns = assign(assigns, :text_class, text_class(assigns))
+
+    ~H"""
+    <.item_button {assigns}>
+      <div class="relative bg-red-100 rounded size-4">
+        <div class={[
+          "absolute -bottom-px -right-0.5 rounded-full size-1.5 ring-2 ring-zinc-950",
+          @online && "bg-emerald-500",
+          !@online && "border border-zinc-500 bg-zinc-950"
+        ]} />
+      </div>
+      <span class={["text-sm truncate", @text_class]}><%= @username %></span>
+      <div
+        :if={@unread_count > 0}
+        class="absolute right-2 flex items-center justify-center bg-rose-500 size-5 rounded"
+      >
+        <span class="text-xs text-white font-semibold"><%= @unread_count %></span>
+      </div>
+    </.item_button>
+    """
+  end
+
+  defp item_button(assigns) do
     ~H"""
     <button
       class={[
-        "flex items-center gap-2 w-full rounded leading-none px-2 py-1",
+        "relative flex items-center gap-2 w-full rounded leading-none px-2 py-1",
         if(@selected, do: "bg-zinc-600", else: "hover:bg-zinc-800"),
         if(@active, do: "font-bold")
       ]}
       {@rest}
     >
-      <.icon name="hero-hashtag" class={["size-3", @text_class]} />
-      <span class={["text-sm truncate", @text_class]}><%= @name %></span>
+      <%= render_slot(@inner_block) %>
     </button>
     """
+  end
+
+  defp text_class(assigns) do
+    if assigns.selected or assigns.active do
+      "text-white"
+    else
+      "text-zinc-400 group-hover:text-white"
+    end
   end
 
   attr :channel, :string, required: true
