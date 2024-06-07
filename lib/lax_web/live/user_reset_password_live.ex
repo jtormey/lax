@@ -1,11 +1,11 @@
 defmodule LaxWeb.UserResetPasswordLive do
-  use LaxWeb, :live_view
+  use LaxWeb, {:live_view, layout: :chat}
 
   alias Lax.Users
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class="mx-auto max-w-sm py-32">
       <.header class="text-center">Reset Password</.header>
 
       <.simple_form
@@ -32,14 +32,17 @@ defmodule LaxWeb.UserResetPasswordLive do
 
       <p class="text-center text-sm mt-4">
         <.link href={~p"/users/register"}>Register</.link>
-        | <.link href={~p"/users/log_in"}>Log in</.link>
+        | <.link href={~p"/users/sign-in"}>Sign in</.link>
       </p>
     </div>
     """
   end
 
   def mount(params, _session, socket) do
-    socket = assign_user_and_token(socket, params)
+    socket =
+      socket
+      |> assign(:domain, :user)
+      |> assign_user_and_token(params)
 
     form_source =
       case socket.assigns do
@@ -61,7 +64,7 @@ defmodule LaxWeb.UserResetPasswordLive do
         {:noreply,
          socket
          |> put_flash(:info, "Password reset successfully.")
-         |> redirect(to: ~p"/users/log_in")}
+         |> redirect(to: ~p"/users/sign-in")}
 
       {:error, changeset} ->
         {:noreply, assign_form(socket, Map.put(changeset, :action, :insert))}

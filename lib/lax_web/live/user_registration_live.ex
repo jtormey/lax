@@ -1,18 +1,18 @@
 defmodule LaxWeb.UserRegistrationLive do
-  use LaxWeb, :live_view
+  use LaxWeb, {:live_view, layout: :chat}
 
   alias Lax.Users
   alias Lax.Users.User
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class="mx-auto max-w-sm py-32">
       <.header class="text-center">
         Register for an account
         <:subtitle>
           Already registered?
-          <.link navigate={~p"/users/log_in"} class="font-semibold text-brand hover:underline">
-            Log in
+          <.link navigate={~p"/users/sign-in"} class="font-semibold text-brand hover:underline">
+            Sign in
           </.link>
           to your account now.
         </:subtitle>
@@ -24,7 +24,7 @@ defmodule LaxWeb.UserRegistrationLive do
         phx-submit="save"
         phx-change="validate"
         phx-trigger-action={@trigger_submit}
-        action={~p"/users/log_in?_action=registered"}
+        action={~p"/users/sign-in?_action=registered"}
         method="post"
       >
         <.error :if={@check_errors}>
@@ -47,6 +47,7 @@ defmodule LaxWeb.UserRegistrationLive do
 
     socket =
       socket
+      |> assign(:domain, :user)
       |> assign(trigger_submit: false, check_errors: false)
       |> assign_form(changeset)
 

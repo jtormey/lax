@@ -5,13 +5,13 @@ defmodule LaxWeb.UserSessionController do
   alias LaxWeb.UserAuth
 
   def create(conn, %{"_action" => "registered"} = params) do
-    create(conn, params, "Account created successfully!")
+    create(conn, params, "Account created successfully.")
   end
 
   def create(conn, %{"_action" => "password_updated"} = params) do
     conn
     |> put_session(:user_return_to, ~p"/users/settings")
-    |> create(params, "Password updated successfully!")
+    |> create(params, "Password updated successfully.")
   end
 
   def create(conn, params) do
@@ -30,13 +30,13 @@ defmodule LaxWeb.UserSessionController do
       conn
       |> put_flash(:error, "Invalid email or password")
       |> put_flash(:email, String.slice(email, 0, 160))
-      |> redirect(to: ~p"/users/log_in")
+      |> redirect(to: ~p"/users/sign-in")
     end
   end
 
   def delete(conn, _params) do
     conn
-    |> put_flash(:info, "Logged out successfully.")
+    |> put_flash(:info, "Signed out.")
     |> UserAuth.log_out_user()
   end
 end

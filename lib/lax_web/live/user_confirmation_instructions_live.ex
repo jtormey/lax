@@ -1,11 +1,11 @@
 defmodule LaxWeb.UserConfirmationInstructionsLive do
-  use LaxWeb, :live_view
+  use LaxWeb, {:live_view, layout: :chat}
 
   alias Lax.Users
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class="mx-auto max-w-sm py-32">
       <.header class="text-center">
         No confirmation instructions received?
         <:subtitle>We'll send a new confirmation link to your inbox</:subtitle>
@@ -22,14 +22,14 @@ defmodule LaxWeb.UserConfirmationInstructionsLive do
 
       <p class="text-center mt-4">
         <.link href={~p"/users/register"}>Register</.link>
-        | <.link href={~p"/users/log_in"}>Log in</.link>
+        | <.link href={~p"/users/sign-in"}>Sign in</.link>
       </p>
     </div>
     """
   end
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, form: to_form(%{}, as: "user"))}
+    {:ok, assign(socket, form: to_form(%{}, as: "user"), domain: :user)}
   end
 
   def handle_event("send_instructions", %{"user" => %{"email" => email}}, socket) do

@@ -1,21 +1,42 @@
+<div class="invisible">
+  <.flash_group flash={@flash} />
+</div>
 <div class="fixed inset-0 bg-zinc-800">
-  <div class="absolute inset-2 flex bg-zinc-950 border border-zinc-700 rounded-lg overflow-hidden">
+  <main class="absolute inset-2 flex bg-zinc-950 border border-zinc-700 rounded-lg overflow-hidden">
     <.sidebar>
       <.sidebar_option
         text="Home"
         icon="hero-home"
         icon_selected="hero-home-solid"
         selected={@domain == :home}
+        navigate={~p"/"}
       />
       <.sidebar_option
         text="DMs"
         icon="hero-chat-bubble-left-right"
         icon_selected="hero-chat-bubble-left-right-solid"
         selected={@domain == :direct_messages}
+        navigate={~p"/"}
       />
+      <.sidebar_option
+        text={if @current_user, do: "User", else: "Sign in"}
+        icon="hero-user"
+        icon_selected="hero-user-solid"
+        selected={@domain == :user}
+        navigate={if @current_user, do: ~p"/users/settings", else: ~p"/users/sign-in"}
+      />
+      <:bottom>
+        <.sidebar_option
+          :if={@current_user}
+          text="Sign out"
+          icon="hero-arrow-left-end-on-rectangle"
+          href={~p"/users/sign-out"}
+          method="delete"
+        />
+      </:bottom>
     </.sidebar>
-    <div class="flex-1">
+    <div class="flex-1 overflow-y-scroll">
       <%= @inner_content %>
     </div>
-  </div>
+  </main>
 </div>

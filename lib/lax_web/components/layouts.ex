@@ -14,21 +14,24 @@ defmodule LaxWeb.Layouts do
 
   ## Components
 
+  slot :bottom, default: []
   slot :inner_block
 
   def sidebar(assigns) do
     ~H"""
-    <div class="border-r border-zinc-700 p-4 space-y-4">
+    <div class="w-16 flex flex-col border-r border-zinc-700 py-4 space-y-4">
       <%= render_slot(@inner_block) %>
+      <div :if={@bottom != []} class="flex-1" />
+      <%= render_slot(@bottom) %>
     </div>
     """
   end
 
   attr :text, :string, required: true
   attr :icon, :string, required: true
-  attr :icon_selected, :string, required: true
-  attr :selected, :boolean, required: true
-  attr :rest, :global, include: ~w(href navigate patch)
+  attr :icon_selected, :string
+  attr :selected, :boolean, default: false
+  attr :rest, :global, include: ~w(href method navigate patch)
 
   def sidebar_option(assigns) do
     ~H"""

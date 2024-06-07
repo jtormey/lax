@@ -17,17 +17,6 @@ defmodule LaxWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", LaxWeb do
-    pipe_through :browser
-
-    live "/", ChatLive, :chat
-  end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", LaxWeb do
-  #   pipe_through :api
-  # end
-
   # Enable Swoosh mailbox preview in development
   if Application.compile_env(:lax, :dev_routes) do
     scope "/dev" do
@@ -45,12 +34,12 @@ defmodule LaxWeb.Router do
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{LaxWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+      live "/users/sign-in", UserLoginLive, :new
+      live "/users/reset-password", UserForgotPasswordLive, :new
+      live "/users/reset-password/:token", UserResetPasswordLive, :edit
     end
 
-    post "/users/log_in", UserSessionController, :create
+    post "/users/sign-in", UserSessionController, :create
   end
 
   scope "/", LaxWeb do
@@ -59,17 +48,18 @@ defmodule LaxWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{LaxWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live "/users/settings/confirm-email/:token", UserSettingsLive, :confirm_email
     end
   end
 
   scope "/", LaxWeb do
     pipe_through [:browser]
 
-    delete "/users/log_out", UserSessionController, :delete
+    delete "/users/sign-out", UserSessionController, :delete
 
     live_session :current_user,
       on_mount: [{LaxWeb.UserAuth, :mount_current_user}] do
+      live "/", ChatLive, :chat
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
