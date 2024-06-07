@@ -22,7 +22,12 @@ defmodule LaxWeb.ChatLive do
       <.chat>
         <.message username="justin" time="2:49 PM" message="hello world" />
       </.chat>
-      <.chat_form form={@chat_form} channel="office-new-york" phx-change="validate" />
+      <.chat_form
+        form={@chat_form}
+        channel="office-new-york"
+        phx-change="validate"
+        phx-submit="submit"
+      />
     </.container>
     """
   end
@@ -41,6 +46,11 @@ defmodule LaxWeb.ChatLive do
       |> Map.put(:action, :validate)
 
     {:noreply, put_form(socket, changeset)}
+  end
+
+  def handle_event("submit", %{"chat" => params}, socket) do
+    IO.inspect(params)
+    {:noreply, put_form(socket)}
   end
 
   def put_form(socket, value \\ %{}) do

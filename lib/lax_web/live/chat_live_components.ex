@@ -137,7 +137,13 @@ defmodule LaxWeb.ChatLiveComponents do
     ~H"""
     <div class="px-4 pb-4">
       <.form for={@form} class="-mt-2" {@rest}>
-        <.input type="textarea" field={@form[:message]} placeholder={"Message ##{@channel}"}>
+        <.input
+          type="textarea"
+          phx-hook="ControlTextarea"
+          field={@form[:message]}
+          placeholder={"Message ##{@channel}"}
+          autofocus
+        >
           <div class="flex items-center p-1">
             <div class="flex-1" />
             <.chat_submit_button disabled={@form[:message].value in [nil, ""]} />
