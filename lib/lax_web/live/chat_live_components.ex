@@ -8,7 +8,12 @@ defmodule LaxWeb.ChatLiveComponents do
   def container(assigns) do
     ~H"""
     <div class="flex h-full">
-      <div style={"width:#{@sidebar_width}px;"} class="border-r border-zinc-700 flex flex-col">
+      <div
+        id="sidebar_resizeable"
+        phx-hook="ResizeContainer"
+        style={"width:#{@sidebar_width}px;"}
+        class="resize-container-right border-r border-zinc-700 flex flex-col"
+      >
         <%= render_slot(@sidebar) %>
       </div>
       <div class="bg-zinc-900 flex-1 flex flex-col">

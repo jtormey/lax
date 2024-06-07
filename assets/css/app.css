@@ -3,3 +3,20 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+.resize-container-right {
+  position: relative;
+}
+
+.resize-container-right::after {
+  @apply bg-sky-500;
+  content: '';
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 2px;
+  opacity: var(--resize-indicator-opacity, 0);
+  transition: opacity 150ms;
+  cursor: col-resize;
+}
