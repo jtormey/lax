@@ -7,7 +7,10 @@ defmodule Lax.Repo.Migrations.CreateUsersAuthTables do
     create table(:users, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :email, :citext, null: false
+      add :username, :citext, null: false
       add :hashed_password, :string, null: false
+      add :display_color, :string, null: false
+      add :ui_settings, :map, default: %{}
       add :confirmed_at, :naive_datetime
       timestamps(type: :utc_datetime)
     end

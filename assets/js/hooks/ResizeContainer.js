@@ -3,6 +3,7 @@ const BORDER_SIZE = 4;
 // https://stackoverflow.com/questions/26233180/resize-a-div-on-border-drag-and-drop-without-adding-extra-markup
 const ResizeContainer = {
   mounted() {
+    this.pushResize = debounce(this.pushResize.bind(this), 100);
     this.onMousemove = this.onMousemove.bind(this);
     this.onMouseup = this.onMouseup.bind(this);
 
@@ -15,6 +16,10 @@ const ResizeContainer = {
     // clean up global event listeners
     document.removeEventListener("mousemove", this.onMousemove, false);
     document.removeEventListener("mousemove", this.onMousemove, false);
+  },
+
+  pushResize(width) {
+    this.pushEvent(this.el.dataset["phx-resize"] || "resize", { width });
   },
 
   onMouseover(event) {
@@ -48,7 +53,7 @@ const ResizeContainer = {
     const width = this.el.getBoundingClientRect().width - dx;
     this.el.style.width = `${width}px`;
 
-    this.pushEvent(this.el.dataset["phx-resize"] || "resize", { width });
+    this.pushResize(width);
   },
 
   onMouseup(event) {
@@ -60,5 +65,18 @@ const ResizeContainer = {
     document.removeEventListener("mouseup", this.onMousemove, false);
   }
 }
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 
 export default ResizeContainer;

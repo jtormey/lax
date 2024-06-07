@@ -1,13 +1,21 @@
 defmodule Lax.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
+    field :display_color, :string
     field :confirmed_at, :naive_datetime
+
+    embeds_one :ui_settings, UiSettings, on_replace: :update, primary_key: false do
+      field :channels_sidebar_width, :integer, default: 250
+    end
 
     timestamps(type: :utc_datetime)
   end
@@ -37,8 +45,9 @@ defmodule Lax.Users.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :username, :password])
     |> validate_email(opts)
+    |> validate_username(opts)
     |> validate_password(opts)
   end
 
@@ -48,6 +57,13 @@ defmodule Lax.Users.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+  end
+
+  defp validate_username(changeset, opts) do
+    changeset
+    |> validate_required([:username])
+    |> validate_length(:username, min: 1, max: 40)
+    |> maybe_validate_unique_username(opts)
   end
 
   defp validate_password(changeset, opts) do
@@ -83,6 +99,16 @@ defmodule Lax.Users.User do
       changeset
       |> unsafe_validate_unique(:email, Lax.Repo)
       |> unique_constraint(:email)
+    else
+      changeset
+    end
+  end
+
+  defp maybe_validate_unique_username(changeset, opts) do
+    if Keyword.get(opts, :validate_username, true) do
+      changeset
+      |> unsafe_validate_unique(:username, Lax.Repo)
+      |> unique_constraint(:username)
     else
       changeset
     end
@@ -128,6 +154,16 @@ defmodule Lax.Users.User do
   def confirm_changeset(user) do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     change(user, confirmed_at: now)
+  end
+
+  def ui_settings_changeset(user, attrs) do
+    user
+    |> cast(attrs, [])
+    |> cast_embed(:ui_settings, with: &ui_settings_embed_changeset/2)
+  end
+
+  def ui_settings_embed_changeset(ui_settings, attrs) do
+    cast(ui_settings, attrs, [:channels_sidebar_width])
   end
 
   @doc """

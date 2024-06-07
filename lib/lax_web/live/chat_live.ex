@@ -1,11 +1,14 @@
 defmodule LaxWeb.ChatLive do
+  alias Lax.Users
   use LaxWeb, {:live_view, layout: :chat}
 
   import LaxWeb.ChatLiveComponents
 
   def render(assigns) do
     ~H"""
-    <.container sidebar_width={256}>
+    <.container sidebar_width={
+      if user = @current_user, do: user.ui_settings.channels_sidebar_width, else: 250
+    }>
       <:sidebar>
         <.sidebar_header />
         <.sidebar>
@@ -48,6 +51,15 @@ defmodule LaxWeb.ChatLive do
      socket
      |> assign(:domain, :home)
      |> put_form()}
+  end
+
+  def handle_event("resize", %{"width" => width}, socket) do
+    {:ok, user} =
+      Users.update_user_ui_settings(socket.assigns.current_user, %{
+        channels_sidebar_width: width
+      })
+
+    {:noreply, assign(socket, :current_user, user)}
   end
 
   def handle_event("validate", %{"chat" => params}, socket) do

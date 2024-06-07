@@ -4,6 +4,7 @@ defmodule Lax.Users do
   """
 
   import Ecto.Query, warn: false
+  alias Lax.Users.Colors
   alias Lax.Repo
 
   alias Lax.Users.{User, UserToken, UserNotifier}
@@ -75,7 +76,7 @@ defmodule Lax.Users do
 
   """
   def register_user(attrs) do
-    %User{}
+    %User{display_color: Colors.random()}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
   end
@@ -90,7 +91,11 @@ defmodule Lax.Users do
 
   """
   def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
+    User.registration_changeset(user, attrs,
+      hash_password: false,
+      validate_email: false,
+      validate_username: false
+    )
   end
 
   ## Settings
@@ -213,6 +218,12 @@ defmodule Lax.Users do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  def update_user_ui_settings(user, attrs) do
+    user
+    |> User.ui_settings_changeset(%{ui_settings: attrs})
+    |> Repo.update()
   end
 
   ## Session
