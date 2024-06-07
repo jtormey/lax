@@ -17,7 +17,7 @@ defmodule LaxWeb.Router do
   scope "/", LaxWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", ChatLive, :chat
   end
 
   # Other scopes may use custom stacks.
@@ -27,7 +27,6 @@ defmodule LaxWeb.Router do
 
   # Enable Swoosh mailbox preview in development
   if Application.compile_env(:lax, :dev_routes) do
-
     scope "/dev" do
       pipe_through :browser
 
