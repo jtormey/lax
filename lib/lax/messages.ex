@@ -14,6 +14,25 @@ defmodule Lax.Messages do
     Repo.all(query)
   end
 
+  def list_latest_in_channels(channel_ids) do
+    window_query =
+      from m in Message,
+        where: m.channel_id in ^channel_ids,
+        select: %{
+          message_id: m.id,
+          row_number: over(row_number(), :channel)
+        },
+        windows: [channel: [partition_by: m.channel_id, order_by: [desc: m.inserted_at]]]
+
+    messages_query =
+      from m in Message,
+        join: t in subquery(window_query),
+        on: t.message_id == m.id and t.row_number == 1,
+        select: {m.channel_id, m}
+
+    Map.new(Repo.all(messages_query))
+  end
+
   def send(channel, sent_by_user, attrs) do
     %Message{}
     |> Map.put(:channel, channel)

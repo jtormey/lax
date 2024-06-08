@@ -6,6 +6,16 @@ defmodule Lax.Users.Membership do
   alias Lax.Channels.ChannelUser
   alias Lax.Repo
 
+  def get_channel!(id, user, type) do
+    Repo.one!(
+      from c in Channel,
+        join: u in assoc(c, :users),
+        where: u.id == ^user.id,
+        where: c.id == ^id,
+        where: c.type == ^type
+    )
+  end
+
   def get_default_channel(nil) do
     query =
       from c in Channel,

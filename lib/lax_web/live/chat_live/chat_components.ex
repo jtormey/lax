@@ -30,11 +30,15 @@ defmodule LaxWeb.ChatLive.Components do
   end
 
   attr :title, :string, required: true
+  slot :actions, default: []
 
   def sidebar_header(assigns) do
     ~H"""
-    <div class="p-4">
-      <.header><%= @title %></.header>
+    <div class="px-4 flex items-center justify-between">
+      <div class="py-4">
+        <.header><%= @title %></.header>
+      </div>
+      <%= render_slot(@actions) %>
     </div>
     """
   end
@@ -146,13 +150,37 @@ defmodule LaxWeb.ChatLive.Components do
     end
   end
 
-  attr :channel, :string, required: true
+  attr :channel, Lax.Channels.Channel, required: true
+  attr :users_fun, :any
 
-  def chat_header(assigns) do
+  def chat_header(%{channel: %{type: :channel}} = assigns) do
     ~H"""
-    <div class="flex gap-2 border-b border-zinc-700 p-4">
+    <div class="border-b border-zinc-700 px-4">
       <.header>
-        <.icon name="hero-hashtag" class="text-white size-5" /> <%= @channel %>
+        <div class="flex gap-2 items-center">
+          <.icon name="hero-hashtag" class="text-white size-5" />
+          <div class="py-4">
+            <%= @channel.name %>
+          </div>
+        </div>
+      </.header>
+    </div>
+    """
+  end
+
+  def chat_header(%{channel: %{type: :direct_message}} = assigns) do
+    ~H"""
+    <div class="border-b border-zinc-700 px-4">
+      <.header>
+        <div class="flex gap-2 items-center">
+          <.icon name="hero-at-symbol" class="text-white size-5" />
+          <div class="py-4">
+            <.intersperse :let={user} enum={@users_fun.(@channel)}>
+              <:separator>,</:separator>
+              <%= user.username %>
+            </.intersperse>
+          </div>
+        </div>
       </.header>
     </div>
     """

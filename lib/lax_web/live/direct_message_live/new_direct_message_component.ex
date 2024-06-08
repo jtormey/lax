@@ -17,11 +17,11 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
         </.header>
       </div>
 
-      <div class="flex-1 relative overflow-y-scroll">
+      <div class="flex-1 relative overflow-y-scroll px-4">
         <div class="flex-1 mx-auto max-w-sm py-16">
           <div
             :for={user <- @users}
-            class="w-full flex gap-4 items-center border-b border-zinc-700 py-4"
+            class="w-full flex gap-4 items-center border-b border-zinc-700 py-6"
           >
             <.user_profile user={user} size={:md} />
             <.username user={user} />

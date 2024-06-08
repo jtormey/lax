@@ -60,8 +60,8 @@ defmodule LaxWeb.Router do
     live_session :current_user,
       on_mount: [{LaxWeb.UserAuth, :mount_current_user}] do
       live "/", ChatLive, :chat
-      live "/direct-messages", DirectMessageLive, :index
-      live "/direct-messages/new", DirectMessageLive, :new
+      live "/direct-messages", DirectMessageLive, :new
+      live "/direct-messages/:id", DirectMessageLive, :show
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end

@@ -1,8 +1,8 @@
 defmodule LaxWeb.ChatLive do
+  alias Lax.Messages.Message
   use LaxWeb, {:live_view, layout: :chat}
 
   alias Lax.Chat
-  alias Lax.Messages.Message
   alias Lax.Users
   alias LaxWeb.ChatLive.ChannelFormComponent
 
@@ -34,7 +34,7 @@ defmodule LaxWeb.ChatLive do
             <.sidebar_subheader>
               Direct messages
               <:actions>
-                <.icon_button icon="hero-plus" phx-click={JS.navigate(~p"/direct-messages/new")} />
+                <.icon_button icon="hero-plus" phx-click={JS.navigate(~p"/direct-messages")} />
               </:actions>
             </.sidebar_subheader>
             <.direct_message_item
@@ -49,7 +49,8 @@ defmodule LaxWeb.ChatLive do
         </.sidebar>
       </:sidebar>
 
-      <.chat_header channel={@chat.current_channel.name} />
+      <.chat_header channel={@chat.current_channel} users_fun={&Chat.direct_message_users(@chat, &1)} />
+
       <.chat>
         <.message
           :for={message <- @chat.messages}
@@ -58,12 +59,8 @@ defmodule LaxWeb.ChatLive do
           message={message.text}
         />
       </.chat>
-      <.chat_form
-        form={@chat_form}
-        placeholder={"Message ##{@chat.current_channel.name}"}
-        phx-change="validate"
-        phx-submit="submit"
-      />
+
+      <.live_component id="chat_component" module={LaxWeb.ChatLive.ChannelChatComponent} chat={@chat} />
     </.container>
 
     <.modal :if={@modal == :new_channel} id="new_channel_modal" show on_cancel={JS.push("hide_modal")}>
@@ -81,8 +78,7 @@ defmodule LaxWeb.ChatLive do
      socket
      |> assign(:domain, :home)
      |> assign(:modal, nil)
-     |> assign(:chat, Chat.load(socket.assigns.current_user))
-     |> handle_form()}
+     |> assign(:chat, Chat.load(socket.assigns.current_user))}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
@@ -106,23 +102,6 @@ defmodule LaxWeb.ChatLive do
     {:noreply, update(socket, :chat, &Chat.select_channel(&1, channel_id))}
   end
 
-  def handle_event("validate", %{"chat" => params}, socket) do
-    {:noreply, handle_form(socket, params, :validate)}
-  end
-
-  def handle_event("submit", %{"chat" => params}, socket) do
-    case Ecto.Changeset.apply_action(changeset(params), :submit) do
-      {:ok, attrs} ->
-        {:noreply,
-         socket
-         |> handle_form()
-         |> update(:chat, &Chat.send_message(&1, attrs))}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, put_form(socket, changeset)}
-    end
-  end
-
   def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
     {:noreply,
      socket
@@ -135,27 +114,6 @@ defmodule LaxWeb.ChatLive do
   end
 
   ## Helpers
-
-  def handle_form(socket, params \\ %{}, action \\ nil) do
-    changeset =
-      params
-      |> changeset()
-      |> Map.put(:action, action)
-
-    put_form(socket, changeset)
-  end
-
-  def put_form(socket, value \\ %{}) do
-    assign(socket, :chat_form, to_form(value, as: :chat))
-  end
-
-  def changeset(params) do
-    import Ecto.Changeset
-
-    {%{}, %{text: :string}}
-    |> cast(params, [:text])
-    |> validate_required([:text])
-  end
 
   def sidebar_width(nil), do: 250
   def sidebar_width(current_user), do: current_user.ui_settings.channels_sidebar_width

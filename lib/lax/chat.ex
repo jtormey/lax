@@ -12,6 +12,7 @@ defmodule Lax.Chat do
     :direct_messages_other_users,
     :current_channel,
     :messages,
+    :latest_message_in_direct_messages,
     :unread_counts
   ]
 
@@ -43,6 +44,10 @@ defmodule Lax.Chat do
 
   def direct_message_users(chat, channel) do
     Map.fetch!(chat.direct_messages_other_users, channel.id)
+  end
+
+  def latest_message(chat, channel) do
+    Map.fetch!(chat.latest_message_in_direct_messages, channel.id)
   end
 
   def select_channel(chat, channel_id) do
@@ -86,7 +91,13 @@ defmodule Lax.Chat do
   end
 
   defp put_messages(chat) do
-    %{chat | messages: Messages.list(chat.current_channel)}
+    direct_message_ids = Enum.map(chat.direct_messages, & &1.id)
+
+    %{
+      chat
+      | messages: Messages.list(chat.current_channel),
+        latest_message_in_direct_messages: Messages.list_latest_in_channels(direct_message_ids)
+    }
   end
 
   defp put_unread_counts(chat) do
