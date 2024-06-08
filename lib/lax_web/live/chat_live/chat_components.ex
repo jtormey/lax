@@ -114,9 +114,14 @@ defmodule LaxWeb.ChatLive.Components do
           !@online && "border border-zinc-500 bg-zinc-950"
         ]} />
       </div>
-      <span :for={user <- @users} class={["text-sm truncate", @text_class]}>
-        <%= user.username %>
-      </span>
+      <div>
+        <.intersperse :let={user} enum={@users}>
+          <:separator><span class="text-zinc-400">,</span></:separator>
+          <span class={["text-sm truncate", @text_class]}>
+            <%= user.username %>
+          </span>
+        </.intersperse>
+      </div>
       <div
         :if={@unread_count > 0}
         class="absolute right-2 flex items-center justify-center bg-rose-500 size-5 rounded"
@@ -176,7 +181,7 @@ defmodule LaxWeb.ChatLive.Components do
           <.icon name="hero-at-symbol" class="text-white size-5" />
           <div class="py-4">
             <.intersperse :let={user} enum={@users_fun.(@channel)}>
-              <:separator>,</:separator>
+              <:separator><span class="text-zinc-400">,</span></:separator>
               <%= user.username %>
             </.intersperse>
           </div>

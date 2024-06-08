@@ -28,10 +28,10 @@ defmodule Lax.Messages do
       from m in Message,
         join: t in subquery(window_query),
         on: t.message_id == m.id and t.row_number == 1,
-        preload: [:sent_by_user],
-        select: {m.channel_id, m}
+        order_by: [desc: m.inserted_at],
+        preload: [:channel, :sent_by_user]
 
-    Map.new(Repo.all(messages_query))
+    Repo.all(messages_query)
   end
 
   def send(channel, sent_by_user, attrs) do

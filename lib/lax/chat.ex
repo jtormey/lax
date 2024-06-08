@@ -55,10 +55,14 @@ defmodule Lax.Chat do
       Indicators.mark_viewed(user, channel_id)
     end
 
-    chat
-    |> Map.put(:current_channel, Repo.get!(Channel, channel_id))
-    |> put_messages()
-    |> put_unread_counts()
+    if channel = Enum.find(chat.channels ++ chat.direct_messages, &(&1.id == channel_id)) do
+      chat
+      |> Map.put(:current_channel, channel)
+      |> put_messages()
+      |> put_unread_counts()
+    else
+      load(chat.user, Repo.get!(Channel, channel_id))
+    end
   end
 
   def send_message(chat, attrs) do

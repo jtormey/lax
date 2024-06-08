@@ -4,11 +4,14 @@ defmodule LaxWeb.DirectMessageLive.Components do
 
   import LaxWeb.UserLive.Components
 
-  def empty_state(assigns) do
+  attr :class, :string, default: nil
+  slot :inner_block
+
+  def notice(assigns) do
     ~H"""
-    <div class="flex-1 flex items-center justify-center">
-      <span class="text-xl text-zinc-500 font-semibold">
-        Select a direct message to chat.
+    <div class={["flex bg-zinc-900 border border-zinc-700 rounded p-2", @class]}>
+      <span class="text-xs text-zinc-500">
+        <%= render_slot(@inner_block) %>
       </span>
     </div>
     """
@@ -43,12 +46,10 @@ defmodule LaxWeb.DirectMessageLive.Components do
         <div class="relative flex-1 flex gap-4">
           <.user_profile user={hd(@users)} size={:md} class="mt-1" />
           <div class="flex-1 text-left">
-            <div>
-              <.intersperse :let={user} enum={@users}>
-                <:separator>,</:separator>
-                <.username user={user} />
-              </.intersperse>
-            </div>
+            <.intersperse :let={user} enum={@users}>
+              <:separator><span class="text-zinc-400">,</span></:separator>
+              <.username user={user} />
+            </.intersperse>
             <div>
               <div class="absolute top-0 right-0">
                 <span class="text-xs text-zinc-400">

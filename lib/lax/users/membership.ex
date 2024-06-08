@@ -48,29 +48,27 @@ defmodule Lax.Users.Membership do
     []
   end
 
-  def list_channels(user, :channel = type) do
-    Repo.all(
-      from c in Channel,
-        join: u in assoc(c, :users),
-        where: u.id == ^user.id,
-        where: c.type == ^type,
-        order_by: [asc: c.name]
-    )
-  end
-
-  def list_channels(user, :direct_message = type) do
-    own_direct_messages =
+  def list_channels(user, type) do
+    query =
       from c in Channel,
         join: u in assoc(c, :users),
         where: u.id == ^user.id,
         where: c.type == ^type
 
-    Repo.all(
-      from c in subquery(own_direct_messages),
-        join: u in assoc(c, :users),
-        where: u.id != ^user.id,
-        order_by: [asc: u.username]
-    )
+    query =
+      case type do
+        :channel ->
+          order_by(query, [c], asc: c.name)
+
+        :direct_message ->
+          order_by(query, [c], desc: c.inserted_at)
+      end
+
+    Repo.all(query)
+  end
+
+  def other_users_in_direct_messages(nil) do
+    %{}
   end
 
   def other_users_in_direct_messages(user) do

@@ -12,28 +12,33 @@ defmodule LaxWeb.DirectMessageLive do
     ~H"""
     <.container
       sidebar_width={sidebar_width(@current_user)}
-      sidebar_min_width={384}
+      sidebar_min_width={288}
       sidebar_max_width={1024}
     >
       <:sidebar>
         <.sidebar_header title="Direct messages">
-          <:actions>
+          <:actions :if={@current_user}>
             <.icon_button icon="hero-plus-mini" phx-click={JS.patch(~p"/direct-messages")} />
           </:actions>
         </.sidebar_header>
+
+        <.notice :if={!@current_user} class="mx-4">
+          Sign in to use the direct messaging feature.
+        </.notice>
+
         <.direct_message_list>
           <.direct_message_item_row
-            :for={channel <- @chat.direct_messages}
+            :for={message <- @chat.latest_message_in_direct_messages}
             current_user={@current_user}
-            users={Chat.direct_message_users(@chat, channel)}
-            latest_message={Chat.latest_message(@chat, channel)}
-            selected={@live_action == :show and Chat.current?(@chat, channel)}
-            phx-click={JS.patch(~p"/direct-messages/#{channel}")}
+            users={Chat.direct_message_users(@chat, message.channel)}
+            latest_message={message}
+            selected={@live_action == :show and Chat.current?(@chat, message.channel)}
+            phx-click={JS.patch(~p"/direct-messages/#{message.channel}")}
           />
         </.direct_message_list>
       </:sidebar>
 
-      <.render_action {assigns} />
+      <.render_action :if={@current_user} {assigns} />
     </.container>
     """
   end
@@ -81,12 +86,12 @@ defmodule LaxWeb.DirectMessageLive do
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
-    {:ok, user} =
-      Users.update_user_ui_settings(socket.assigns.current_user, %{
-        direct_messages_sidebar_width: width
-      })
-
-    {:noreply, assign(socket, :current_user, user)}
+    if user = socket.assigns.current_user do
+      {:ok, user} = Users.update_user_ui_settings(user, %{direct_messages_sidebar_width: width})
+      {:noreply, assign(socket, :current_user, user)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_info({Lax.Messages, {:new_message, message}}, socket) do

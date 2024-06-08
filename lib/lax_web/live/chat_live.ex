@@ -7,6 +7,7 @@ defmodule LaxWeb.ChatLive do
   alias LaxWeb.ChatLive.ChannelFormComponent
 
   import LaxWeb.ChatLive.Components
+  import LaxWeb.DirectMessageLive.Components
 
   def render(assigns) do
     ~H"""
@@ -46,6 +47,10 @@ defmodule LaxWeb.ChatLive do
               phx-click={JS.push("select_channel", value: %{id: channel.id})}
             />
           </.sidebar_section>
+
+          <.notice :if={!@current_user}>
+            Sign in to use the direct messaging feature.
+          </.notice>
         </.sidebar>
       </:sidebar>
 
@@ -60,7 +65,16 @@ defmodule LaxWeb.ChatLive do
         />
       </.chat>
 
-      <.live_component id="chat_component" module={LaxWeb.ChatLive.ChannelChatComponent} chat={@chat} />
+      <.live_component
+        :if={@current_user}
+        id="chat_component"
+        module={LaxWeb.ChatLive.ChannelChatComponent}
+        chat={@chat}
+      />
+
+      <.notice :if={!@current_user} class="mx-4 mb-4 -mt-2">
+        You are viewing this channel anonymously. Sign in to send messages.
+      </.notice>
     </.container>
 
     <.modal :if={@modal == :new_channel} id="new_channel_modal" show on_cancel={JS.push("hide_modal")}>
@@ -82,12 +96,12 @@ defmodule LaxWeb.ChatLive do
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
-    {:ok, user} =
-      Users.update_user_ui_settings(socket.assigns.current_user, %{
-        channels_sidebar_width: width
-      })
-
-    {:noreply, assign(socket, :current_user, user)}
+    if user = socket.assigns.current_user do
+      {:ok, user} = Users.update_user_ui_settings(user, %{channels_sidebar_width: width})
+      {:noreply, assign(socket, :current_user, user)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("show_new_channel", _params, socket) do

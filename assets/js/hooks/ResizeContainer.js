@@ -53,6 +53,7 @@ const ResizeContainer = {
     let width = this.el.getBoundingClientRect().width - dx;
     width = Math.min(width, parseInt(this.el.dataset["maxWidth"]))
     width = Math.max(width, parseInt(this.el.dataset["minWidth"]))
+    width = Math.round(width)
 
     this.el.style.width = `${width}px`;
     this.pushResize(width);

@@ -76,14 +76,14 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
     {:noreply,
      socket
      |> update(:selected_user_ids, &MapSet.put(&1, user_id))
-     |> handle_form(:validate)}
+     |> handle_form()}
   end
 
   def handle_event("remove", %{"id" => user_id}, socket) do
     {:noreply,
      socket
      |> update(:selected_user_ids, &MapSet.delete(&1, user_id))
-     |> handle_form(:validate)}
+     |> handle_form()}
   end
 
   def handle_event("validate", %{"chat" => params}, socket) do
@@ -106,7 +106,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
 
         {:ok, _message} = Messages.send(channel, socket.assigns.current_user, %{text: text})
 
-        {:noreply, push_navigate(socket, to: ~p"/direct-messages")}
+        {:noreply, push_patch(socket, to: ~p"/direct-messages/#{channel}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, put_form(socket, changeset)}
