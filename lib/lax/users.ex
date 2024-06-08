@@ -4,6 +4,7 @@ defmodule Lax.Users do
   """
 
   import Ecto.Query, warn: false
+  alias Lax.Users.Membership
   alias Lax.Users.Colors
   alias Lax.Repo
 
@@ -79,6 +80,10 @@ defmodule Lax.Users do
     %User{display_color: Colors.random()}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+    |> tap(fn
+      {:ok, user} -> Membership.join_default_channels!(user)
+      error -> error
+    end)
   end
 
   @doc """

@@ -1,6 +1,9 @@
 defmodule LaxWeb.ChatLive do
-  alias Lax.Users
   use LaxWeb, {:live_view, layout: :chat}
+
+  alias Lax.Chat
+  alias Lax.Messages.Message
+  alias Lax.Users
 
   import LaxWeb.ChatLiveComponents
 
@@ -14,9 +17,12 @@ defmodule LaxWeb.ChatLive do
             <.sidebar_subheader>
               Channels
             </.sidebar_subheader>
-            <.channel_item name="office-austin" />
-            <.channel_item name="office-new-york" selected />
-            <.channel_item name="office-sf" active />
+            <.channel_item
+              :for={channel <- @chat.channels}
+              name={channel.name}
+              selected={Chat.current?(@chat, channel)}
+              phx-click={JS.push("select_channel", value: %{id: channel.id})}
+            />
           </.sidebar_section>
 
           <.sidebar_section>
@@ -30,13 +36,18 @@ defmodule LaxWeb.ChatLive do
         </.sidebar>
       </:sidebar>
 
-      <.chat_header channel="office-new-york" />
+      <.chat_header channel={@chat.current_channel.name} />
       <.chat>
-        <.message username="justin" time="2:49 PM" message="hello world" />
+        <.message
+          :for={message <- @chat.messages}
+          username={message.sent_by_user.username}
+          time={Message.show_time(message)}
+          message={message.text}
+        />
       </.chat>
       <.chat_form
         form={@chat_form}
-        channel="office-new-york"
+        channel={@chat.current_channel.name}
         phx-change="validate"
         phx-submit="submit"
       />
@@ -48,6 +59,7 @@ defmodule LaxWeb.ChatLive do
     {:ok,
      socket
      |> assign(:domain, :home)
+     |> assign(:chat, Chat.load(socket.assigns.current_user))
      |> put_form()}
   end
 
@@ -60,6 +72,10 @@ defmodule LaxWeb.ChatLive do
     {:noreply, assign(socket, :current_user, user)}
   end
 
+  def handle_event("select_channel", %{"id" => channel_id}, socket) do
+    {:noreply, update(socket, :chat, &Chat.select_channel(&1, channel_id))}
+  end
+
   def handle_event("validate", %{"chat" => params}, socket) do
     changeset =
       {%{}, %{message: :string}}
@@ -70,8 +86,11 @@ defmodule LaxWeb.ChatLive do
   end
 
   def handle_event("submit", %{"chat" => params}, socket) do
-    IO.inspect(params)
-    {:noreply, put_form(socket)}
+    {:noreply, put_form(socket) |> update(:chat, &Chat.send_message(&1, params))}
+  end
+
+  def handle_info({Lax.Messages, {:new_message, message}}, socket) do
+    {:noreply, update(socket, :chat, &Chat.receive_message(&1, message))}
   end
 
   ## Helpers

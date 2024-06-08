@@ -17,6 +17,8 @@ defmodule Lax.Users.User do
       field :channels_sidebar_width, :integer, default: 250
     end
 
+    many_to_many :channels, Lax.Channels.Channel, join_through: Lax.Channels.ChannelUser
+
     timestamps(type: :utc_datetime)
   end
 

@@ -388,7 +388,7 @@ defmodule LaxWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-300 bg-zinc-800 focus:ring-0 sm:text-sm sm:leading-6",
+          "mt-2 block w-full rounded-lg text-zinc-300 bg-zinc-800 focus:ring-0 sm:text-sm sm:leading-4",
           "phx-no-feedback:border-zinc-600 phx-no-feedback:focus:border-zinc-500",
           @errors == [] && "border-zinc-600 focus:border-zinc-500",
           @errors != [] && "border-rose-400 focus:border-rose-400"
