@@ -7,11 +7,11 @@ defmodule Lax.Chat do
 
   defstruct [:user, :channels, :current_channel, :messages, :unread_counts]
 
-  def load(user) do
+  def load(user, channel \\ nil) do
     %__MODULE__{
       user: user,
       channels: Membership.list_channels(user, :channel),
-      current_channel: Membership.get_default_channel(user)
+      current_channel: channel || Membership.get_default_channel(user)
     }
     |> tap(&Indicators.mark_viewed(user, &1.current_channel.id))
     |> subscribe_messages()

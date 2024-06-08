@@ -4,6 +4,7 @@ defmodule LaxWeb.ChatLive do
   alias Lax.Chat
   alias Lax.Messages.Message
   alias Lax.Users
+  alias __MODULE__.ChannelFormComponent
 
   import LaxWeb.ChatLiveComponents
 
@@ -16,6 +17,9 @@ defmodule LaxWeb.ChatLive do
           <.sidebar_section>
             <.sidebar_subheader>
               Channels
+              <:actions>
+                <.icon_button icon="hero-plus" phx-click="show_new_channel" />
+              </:actions>
             </.sidebar_subheader>
             <.channel_item
               :for={channel <- @chat.channels}
@@ -53,6 +57,14 @@ defmodule LaxWeb.ChatLive do
         phx-submit="submit"
       />
     </.container>
+
+    <.modal :if={@modal == :new_channel} id="new_channel_modal" show on_cancel={JS.push("hide_modal")}>
+      <.live_component
+        id="new_channel_form"
+        module={__MODULE__.ChannelFormComponent}
+        current_user={@current_user}
+      />
+    </.modal>
     """
   end
 
@@ -60,6 +72,7 @@ defmodule LaxWeb.ChatLive do
     {:ok,
      socket
      |> assign(:domain, :home)
+     |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
      |> put_form()}
   end
@@ -71,6 +84,14 @@ defmodule LaxWeb.ChatLive do
       })
 
     {:noreply, assign(socket, :current_user, user)}
+  end
+
+  def handle_event("show_new_channel", _params, socket) do
+    {:noreply, assign(socket, :modal, :new_channel)}
+  end
+
+  def handle_event("hide_modal", _params, socket) do
+    {:noreply, assign(socket, :modal, nil)}
   end
 
   def handle_event("select_channel", %{"id" => channel_id}, socket) do
@@ -88,6 +109,13 @@ defmodule LaxWeb.ChatLive do
 
   def handle_event("submit", %{"chat" => params}, socket) do
     {:noreply, put_form(socket) |> update(:chat, &Chat.send_message(&1, params))}
+  end
+
+  def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
+    {:noreply,
+     socket
+     |> assign(:chat, Chat.load(socket.assigns.current_user, channel))
+     |> assign(:modal, nil)}
   end
 
   def handle_info({Lax.Messages, {:new_message, message}}, socket) do

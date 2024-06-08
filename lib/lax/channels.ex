@@ -16,7 +16,7 @@ defmodule Lax.Channels do
       case create(attrs) do
         {:ok, channel} ->
           Membership.join_channel!(user, channel)
-          {:ok, channel}
+          channel
 
         {:error, reason} ->
           Repo.rollback(reason)

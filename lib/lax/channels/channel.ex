@@ -18,6 +18,8 @@ defmodule Lax.Channels.Channel do
     channel
     |> cast(attrs, [:name])
     |> validate_required([:name])
-    |> validate_format(:name, ~r/^[\-\_a-z0-9]+$/)
+    |> validate_format(:name, ~r/^[a-z][\-\_a-z0-9]*$/,
+      message: "must consist of lowercase letters, dashes, and underscores only"
+    )
   end
 end
