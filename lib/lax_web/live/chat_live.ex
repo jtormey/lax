@@ -41,7 +41,7 @@ defmodule LaxWeb.ChatLive do
         <.message
           :for={message <- @chat.messages}
           username={message.sent_by_user.username}
-          time={Message.show_time(message)}
+          time={Message.show_time(message, @current_user.time_zone)}
           message={message.text}
         />
       </.chat>

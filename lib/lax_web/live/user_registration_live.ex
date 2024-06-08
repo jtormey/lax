@@ -35,6 +35,14 @@ defmodule LaxWeb.UserRegistrationLive do
         <.input field={@form[:username]} label="Username" required />
         <.input field={@form[:password]} type="password" label="Password" required />
 
+        <input
+          type="hidden"
+          id={@form[:time_zone].id}
+          name={@form[:time_zone].name}
+          phx-hook="SetTimeZoneValue"
+          phx-update="ignore"
+        />
+
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
         </:actions>

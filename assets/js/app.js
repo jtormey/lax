@@ -23,10 +23,12 @@ import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import ControlTextarea from "./hooks/ControlTextarea"
 import ResizeContainer from "./hooks/ResizeContainer"
+import SetTimeZoneValue from "./hooks/SetTimeZoneValue"
 
 const hooks = {
   ControlTextarea,
-  ResizeContainer
+  ResizeContainer,
+  SetTimeZoneValue
 }
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")

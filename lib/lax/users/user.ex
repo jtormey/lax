@@ -10,6 +10,7 @@ defmodule Lax.Users.User do
     field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
+    field :time_zone, :string
     field :display_color, :string
     field :confirmed_at, :naive_datetime
 
@@ -47,10 +48,11 @@ defmodule Lax.Users.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :username, :password])
+    |> cast(attrs, [:email, :username, :password, :time_zone])
     |> validate_email(opts)
     |> validate_username(opts)
     |> validate_password(opts)
+    |> validate_time_zone()
   end
 
   defp validate_email(changeset, opts) do
@@ -71,7 +73,7 @@ defmodule Lax.Users.User do
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
-    |> validate_length(:password, min: 12, max: 72)
+    |> validate_length(:password, min: 8, max: 72)
     # Examples of additional password validation:
     # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
@@ -114,6 +116,12 @@ defmodule Lax.Users.User do
     else
       changeset
     end
+  end
+
+  defp validate_time_zone(changeset) do
+    changeset
+    |> validate_required([:time_zone])
+    |> validate_inclusion(:time_zone, Tzdata.zone_list())
   end
 
   @doc """

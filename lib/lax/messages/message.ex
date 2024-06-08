@@ -20,7 +20,7 @@ defmodule Lax.Messages.Message do
     |> validate_required([:text])
   end
 
-  def show_time(message, time_zone \\ "America/Chicago") do
+  def show_time(message, time_zone) do
     message.inserted_at
     |> DateTime.from_naive!("Etc/UTC")
     |> DateTime.shift_zone!(time_zone)

@@ -9,6 +9,7 @@ defmodule Lax.Repo.Migrations.CreateUsersAuthTables do
       add :email, :citext, null: false
       add :username, :citext, null: false
       add :hashed_password, :string, null: false
+      add :time_zone, :string, null: false
       add :display_color, :string, null: false
       add :ui_settings, :map, default: %{}
       add :confirmed_at, :naive_datetime
