@@ -5,12 +5,22 @@ defmodule Lax.Chat do
   alias Lax.Repo
   alias Lax.Users.Membership
 
-  defstruct [:user, :channels, :current_channel, :messages, :unread_counts]
+  defstruct [
+    :user,
+    :channels,
+    :direct_messages,
+    :direct_messages_other_users,
+    :current_channel,
+    :messages,
+    :unread_counts
+  ]
 
   def load(user, channel \\ nil) do
     %__MODULE__{
       user: user,
       channels: Membership.list_channels(user, :channel),
+      direct_messages: Membership.list_channels(user, :direct_message),
+      direct_messages_other_users: Membership.other_users_in_direct_messages(user),
       current_channel: channel || Membership.get_default_channel(user)
     }
     |> tap(&Indicators.mark_viewed(user, &1.current_channel.id))
@@ -29,6 +39,10 @@ defmodule Lax.Chat do
 
   def unread_count(chat, channel) do
     Map.get(chat.unread_counts, channel.id, 0)
+  end
+
+  def direct_message_users(chat, channel) do
+    Map.fetch!(chat.direct_messages_other_users, channel.id)
   end
 
   def select_channel(chat, channel_id) do
@@ -64,7 +78,7 @@ defmodule Lax.Chat do
   ## Private
 
   defp subscribe_messages(chat) do
-    for channel <- chat.channels do
+    for channel <- chat.channels ++ chat.direct_messages do
       Messages.subscribe_to_sent_messages(channel)
     end
 

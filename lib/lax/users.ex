@@ -62,6 +62,18 @@ defmodule Lax.Users do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_all(ids) do
+    Repo.all(from u in User, where: u.id in ^ids)
+  end
+
+  def list_other_users(user) do
+    Repo.all(
+      from u in User,
+        where: u.id != ^user.id,
+        order_by: [asc: u.username]
+    )
+  end
+
   ## User registration
 
   @doc """

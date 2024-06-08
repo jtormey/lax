@@ -225,6 +225,9 @@ defmodule LaxWeb.CoreComponents do
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
   attr :type, :string, default: nil
+  attr :icon, :string, default: nil
+  attr :icon_position, :atom, values: [:left, :right], default: :left
+  attr :variant, :atom, values: [:primary, :action], default: :primary
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
 
@@ -235,15 +238,29 @@ defmodule LaxWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
-        @class
+        @class,
+        variant_class(@variant),
+        "flex gap-2 items-center",
+        if(@icon_position == :left, do: "flex-row", else: "flex-row-reverse"),
+        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
+        "text-sm font-semibold leading-6"
       ]}
       {@rest}
     >
+      <.icon :if={@icon} name={@icon} class="size-4" />
       <%= render_slot(@inner_block) %>
     </button>
     """
+  end
+
+  defp variant_class(variant) do
+    case variant do
+      :primary ->
+        "text-white active:text-white/80 bg-zinc-900 hover:bg-zinc-700 "
+
+      :action ->
+        "text-white active:text-white/80 bg-emerald-600 hover:bg-emerald-700 "
+    end
   end
 
   attr :icon, :string, required: true

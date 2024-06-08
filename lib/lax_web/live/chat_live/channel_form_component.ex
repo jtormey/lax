@@ -27,7 +27,7 @@ defmodule LaxWeb.ChatLive.ChannelFormComponent do
   def handle_event("validate", %{"channel" => params}, socket) do
     changeset =
       %Channel{}
-      |> Channel.changeset(params)
+      |> Channel.changeset(:channel, params)
       |> Map.put(:action, :validate)
 
     {:noreply, put_form(socket, changeset)}

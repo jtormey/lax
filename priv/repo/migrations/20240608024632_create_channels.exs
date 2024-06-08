@@ -4,7 +4,7 @@ defmodule Lax.Repo.Migrations.CreateChannels do
   def change do
     create table(:channels, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :name, :string, null: false
+      add :name, :string, null: true
       add :type, :string, null: false
 
       timestamps()

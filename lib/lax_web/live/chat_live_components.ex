@@ -1,7 +1,11 @@
 defmodule LaxWeb.ChatLiveComponents do
   use LaxWeb, :html
 
+  import LaxWeb.UserLive.UserComponents
+
   attr :sidebar_width, :integer, required: true
+  attr :sidebar_min_width, :integer, default: 128
+  attr :sidebar_max_width, :integer, default: 512
   slot :sidebar, required: true
   slot :inner_block, required: true
 
@@ -11,8 +15,8 @@ defmodule LaxWeb.ChatLiveComponents do
       <div
         id="sidebar_resizeable"
         phx-hook="ResizeContainer"
-        data-min-width={128}
-        data-max-width={512}
+        data-min-width={@sidebar_min_width}
+        data-max-width={@sidebar_max_width}
         style={"width:#{@sidebar_width}px;"}
         class="resize-container-right border-r border-zinc-700 flex flex-col"
       >
@@ -25,10 +29,12 @@ defmodule LaxWeb.ChatLiveComponents do
     """
   end
 
+  attr :title, :string, required: true
+
   def sidebar_header(assigns) do
     ~H"""
     <div class="p-4">
-      <.header>Workspace</.header>
+      <.header><%= @title %></.header>
     </div>
     """
   end
@@ -85,14 +91,14 @@ defmodule LaxWeb.ChatLiveComponents do
     """
   end
 
-  attr :username, :string, required: true
+  attr :users, :list, required: true
   attr :selected, :boolean, default: false
   attr :active, :boolean, default: false
   attr :online, :boolean, default: false
   attr :unread_count, :integer, default: 0
   attr :rest, :global, include: ~w(phx-click phx-target)
 
-  def dm_item(assigns) do
+  def direct_message_item(assigns) do
     assigns = assign(assigns, :text_class, text_class(assigns))
 
     ~H"""
@@ -104,7 +110,9 @@ defmodule LaxWeb.ChatLiveComponents do
           !@online && "border border-zinc-500 bg-zinc-950"
         ]} />
       </div>
-      <span class={["text-sm truncate", @text_class]}><%= @username %></span>
+      <span :for={user <- @users} class={["text-sm truncate", @text_class]}>
+        <%= user.username %>
+      </span>
       <div
         :if={@unread_count > 0}
         class="absolute right-2 flex items-center justify-center bg-rose-500 size-5 rounded"
@@ -160,19 +168,17 @@ defmodule LaxWeb.ChatLiveComponents do
     """
   end
 
-  attr :username, :string, required: true
+  attr :user, Lax.Users.User, required: true
   attr :time, :string, required: true
   attr :message, :string, required: true
 
   def message(assigns) do
     ~H"""
     <div class="flex gap-2 hover:bg-zinc-800 px-4 py-2">
-      <div class="size-8 bg-red-100 rounded-lg mt-1"></div>
+      <.user_profile user={@user} size={:md} class="mt-1" />
       <div>
         <div class="space-x-1 leading-none">
-          <span class="text-sm text-white font-bold">
-            <%= @username %>
-          </span>
+          <.username user={@user} />
           <span class="text-xs text-zinc-400">
             <%= @time %>
           </span>
@@ -188,8 +194,8 @@ defmodule LaxWeb.ChatLiveComponents do
   end
 
   attr :form, Phoenix.HTML.Form, required: true
-  attr :channel, :string, required: true
-  attr :rest, :global, include: ~w(phx-change phx-submit)
+  attr :placeholder, :string, required: true
+  attr :rest, :global, include: ~w(phx-change phx-submit phx-target)
 
   def chat_form(assigns) do
     ~H"""
@@ -199,12 +205,12 @@ defmodule LaxWeb.ChatLiveComponents do
           type="textarea"
           phx-hook="ControlTextarea"
           field={@form[:text]}
-          placeholder={"Message ##{@channel}"}
+          placeholder={@placeholder}
           autofocus
         >
           <div class="flex items-center p-1">
             <div class="flex-1" />
-            <.chat_submit_button disabled={@form[:text].value in [nil, ""]} />
+            <.chat_submit_button disabled={not @form.source.valid?} />
           </div>
         </.input>
       </.form>

@@ -14,12 +14,19 @@ defmodule Lax.Channels.Channel do
     timestamps()
   end
 
-  def changeset(channel, attrs) do
+  def changeset(channel, :channel, attrs) do
     channel
     |> cast(attrs, [:name])
+    |> put_change(:type, :channel)
     |> validate_required([:name])
     |> validate_format(:name, ~r/^[a-z][\-\_a-z0-9]*$/,
       message: "must consist of lowercase letters, dashes, and underscores only"
     )
+  end
+
+  def changeset(channel, :direct_message, attrs) do
+    channel
+    |> cast(attrs, [])
+    |> put_change(:type, :direct_message)
   end
 end

@@ -16,7 +16,7 @@
         icon="hero-chat-bubble-left-right"
         icon_selected="hero-chat-bubble-left-right-solid"
         selected={@domain == :direct_messages}
-        navigate={~p"/"}
+        navigate={~p"/direct-messages"}
       />
       <.sidebar_option
         text={if @current_user, do: "User", else: "Sign in"}

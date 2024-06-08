@@ -12,7 +12,7 @@ defmodule LaxWeb.ChatLive do
     ~H"""
     <.container sidebar_width={sidebar_width(@current_user)}>
       <:sidebar>
-        <.sidebar_header />
+        <.sidebar_header title="Workspace" />
         <.sidebar>
           <.sidebar_section>
             <.sidebar_subheader>
@@ -33,10 +33,18 @@ defmodule LaxWeb.ChatLive do
           <.sidebar_section>
             <.sidebar_subheader>
               Direct messages
+              <:actions>
+                <.icon_button icon="hero-plus" phx-click={JS.navigate(~p"/direct-messages/new")} />
+              </:actions>
             </.sidebar_subheader>
-            <.dm_item username="justin" />
-            <.dm_item username="blaine" online active />
-            <.dm_item username="ramon" unread_count={3} />
+            <.direct_message_item
+              :for={channel <- @chat.direct_messages}
+              users={Chat.direct_message_users(@chat, channel)}
+              selected={Chat.current?(@chat, channel)}
+              active={Chat.has_activity?(@chat, channel)}
+              unread_count={Chat.unread_count(@chat, channel)}
+              phx-click={JS.push("select_channel", value: %{id: channel.id})}
+            />
           </.sidebar_section>
         </.sidebar>
       </:sidebar>
@@ -45,14 +53,14 @@ defmodule LaxWeb.ChatLive do
       <.chat>
         <.message
           :for={message <- @chat.messages}
-          username={message.sent_by_user.username}
+          user={message.sent_by_user}
           time={Message.show_time(message, @current_user && @current_user.time_zone)}
           message={message.text}
         />
       </.chat>
       <.chat_form
         form={@chat_form}
-        channel={@chat.current_channel.name}
+        placeholder={"Message ##{@chat.current_channel.name}"}
         phx-change="validate"
         phx-submit="submit"
       />
@@ -74,7 +82,7 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
-     |> put_form()}
+     |> handle_form()}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
@@ -99,16 +107,20 @@ defmodule LaxWeb.ChatLive do
   end
 
   def handle_event("validate", %{"chat" => params}, socket) do
-    changeset =
-      {%{}, %{message: :string}}
-      |> Ecto.Changeset.cast(params, [:message])
-      |> Map.put(:action, :validate)
-
-    {:noreply, put_form(socket, changeset)}
+    {:noreply, handle_form(socket, params, :validate)}
   end
 
   def handle_event("submit", %{"chat" => params}, socket) do
-    {:noreply, put_form(socket) |> update(:chat, &Chat.send_message(&1, params))}
+    case Ecto.Changeset.apply_action(changeset(params), :submit) do
+      {:ok, attrs} ->
+        {:noreply,
+         socket
+         |> handle_form()
+         |> update(:chat, &Chat.send_message(&1, attrs))}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, put_form(socket, changeset)}
+    end
   end
 
   def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
@@ -124,8 +136,25 @@ defmodule LaxWeb.ChatLive do
 
   ## Helpers
 
+  def handle_form(socket, params \\ %{}, action \\ nil) do
+    changeset =
+      params
+      |> changeset()
+      |> Map.put(:action, action)
+
+    put_form(socket, changeset)
+  end
+
   def put_form(socket, value \\ %{}) do
     assign(socket, :chat_form, to_form(value, as: :chat))
+  end
+
+  def changeset(params) do
+    import Ecto.Changeset
+
+    {%{}, %{text: :string}}
+    |> cast(params, [:text])
+    |> validate_required([:text])
   end
 
   def sidebar_width(nil), do: 250
