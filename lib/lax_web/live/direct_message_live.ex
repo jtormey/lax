@@ -3,8 +3,8 @@ defmodule LaxWeb.DirectMessageLive do
 
   alias Lax.Users
 
-  import LaxWeb.ChatLiveComponents
-  import __MODULE__.Components
+  import LaxWeb.ChatLive.Components
+  import LaxWeb.DirectMessageLive.Components
 
   def render(assigns) do
     ~H"""

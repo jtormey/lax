@@ -1,7 +1,7 @@
-defmodule LaxWeb.ChatLiveComponents do
+defmodule LaxWeb.ChatLive.Components do
   use LaxWeb, :html
 
-  import LaxWeb.UserLive.UserComponents
+  import LaxWeb.UserLive.Components
 
   attr :sidebar_width, :integer, required: true
   attr :sidebar_min_width, :integer, default: 128

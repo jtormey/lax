@@ -4,9 +4,9 @@ defmodule LaxWeb.ChatLive do
   alias Lax.Chat
   alias Lax.Messages.Message
   alias Lax.Users
-  alias __MODULE__.ChannelFormComponent
+  alias LaxWeb.ChatLive.ChannelFormComponent
 
-  import LaxWeb.ChatLiveComponents
+  import LaxWeb.ChatLive.Components
 
   def render(assigns) do
     ~H"""

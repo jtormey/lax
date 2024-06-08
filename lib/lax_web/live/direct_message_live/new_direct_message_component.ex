@@ -1,12 +1,12 @@
 defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
-  alias Lax.Messages
-  alias Lax.Channels
   use LaxWeb, :live_component
 
+  alias Lax.Channels
+  alias Lax.Messages
   alias Lax.Users
 
-  import LaxWeb.ChatLiveComponents
-  import LaxWeb.UserLive.UserComponents
+  import LaxWeb.ChatLive.Components
+  import LaxWeb.UserLive.Components
 
   def render(assigns) do
     ~H"""

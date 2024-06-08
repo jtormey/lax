@@ -2,9 +2,9 @@ defmodule Lax.Users.Membership do
   import Ecto.Query
 
   alias Lax.Channels.DefaultChannel
-  alias Lax.Repo
   alias Lax.Channels.Channel
   alias Lax.Channels.ChannelUser
+  alias Lax.Repo
 
   def get_default_channel(nil) do
     query =

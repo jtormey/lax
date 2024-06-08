@@ -1,7 +1,8 @@
 defmodule LaxWeb.ChatLive.ChannelFormComponent do
+  use LaxWeb, :live_component
+
   alias Lax.Channels
   alias Lax.Channels.Channel
-  use LaxWeb, :live_component
 
   def render(assigns) do
     ~H"""

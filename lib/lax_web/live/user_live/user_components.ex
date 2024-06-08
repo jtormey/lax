@@ -1,4 +1,4 @@
-defmodule LaxWeb.UserLive.UserComponents do
+defmodule LaxWeb.UserLive.Components do
   use LaxWeb, :html
 
   attr :user, Lax.Users.User, required: true
