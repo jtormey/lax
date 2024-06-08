@@ -217,9 +217,7 @@ defmodule LaxWeb.ChatLive.Components do
           </span>
         </div>
         <div>
-          <p class="text-sm text-zinc-300">
-            <%= @message %>
-          </p>
+          <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @message %></p>
         </div>
       </div>
     </div>
