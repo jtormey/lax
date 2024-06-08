@@ -240,7 +240,7 @@ defmodule LaxWeb.CoreComponents do
       class={[
         @class,
         variant_class(@variant),
-        "flex gap-2 items-center",
+        "flex gap-2 items-center justify-center",
         if(@icon_position == :left, do: "flex-row", else: "flex-row-reverse"),
         "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
         "text-sm font-semibold leading-6"
