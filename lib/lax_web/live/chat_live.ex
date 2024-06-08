@@ -21,6 +21,7 @@ defmodule LaxWeb.ChatLive do
               :for={channel <- @chat.channels}
               name={channel.name}
               selected={Chat.current?(@chat, channel)}
+              active={Chat.has_activity?(@chat, channel)}
               phx-click={JS.push("select_channel", value: %{id: channel.id})}
             />
           </.sidebar_section>
@@ -41,7 +42,7 @@ defmodule LaxWeb.ChatLive do
         <.message
           :for={message <- @chat.messages}
           username={message.sent_by_user.username}
-          time={Message.show_time(message, @current_user.time_zone)}
+          time={Message.show_time(message, @current_user && @current_user.time_zone)}
           message={message.text}
         />
       </.chat>

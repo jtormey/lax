@@ -21,10 +21,17 @@ defmodule Lax.Messages.Message do
   end
 
   def show_time(message, time_zone) do
+    {time_zone, strfmt} =
+      if time_zone do
+        {time_zone, "%I:%M %p"}
+      else
+        {"America/New_York", "%I:%M %p (%Z)"}
+      end
+
     message.inserted_at
     |> DateTime.from_naive!("Etc/UTC")
     |> DateTime.shift_zone!(time_zone)
-    |> Calendar.strftime("%I:%M %p")
+    |> Calendar.strftime(strfmt)
     |> String.trim_leading("0")
   end
 end
