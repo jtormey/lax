@@ -10,6 +10,8 @@ defmodule Lax.Repo.Migrations.CreateChannels do
       timestamps()
     end
 
+    create unique_index(:channels, [:name])
+
     create table(:default_channels, primary_key: false) do
       add :channel_id, references(:channels, type: :binary_id, on_delete: :delete_all),
         primary_key: true

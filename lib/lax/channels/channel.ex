@@ -22,6 +22,8 @@ defmodule Lax.Channels.Channel do
     |> validate_format(:name, ~r/^[a-z][\-\_a-z0-9]*$/,
       message: "must consist of lowercase letters, dashes, and underscores only"
     )
+    |> unsafe_validate_unique(:name, Lax.Repo)
+    |> unique_constraint(:name)
   end
 
   def changeset(channel, :direct_message, attrs) do
