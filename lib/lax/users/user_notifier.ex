@@ -1,7 +1,7 @@
 defmodule Lax.Users.UserNotifier do
   import Swoosh.Email
 
-  alias Lax.Mailer
+  # alias Lax.Mailer
 
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
@@ -12,9 +12,10 @@ defmodule Lax.Users.UserNotifier do
       |> subject(subject)
       |> text_body(body)
 
-    with {:ok, _metadata} <- Mailer.deliver(email) do
-      {:ok, email}
-    end
+    # with {:ok, _metadata} <- Mailer.deliver(email) do
+    #   {:ok, email}
+    # end
+    {:ok, email}
   end
 
   @doc """
