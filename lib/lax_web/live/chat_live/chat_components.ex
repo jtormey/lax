@@ -204,7 +204,7 @@ defmodule LaxWeb.ChatLive.Components do
     ~H"""
     <div class="flex gap-2 hover:bg-zinc-800 px-4 py-2">
       <.user_profile user={@user} size={:md} class="mt-1" />
-      <div>
+      <div class="flex-1">
         <div class="space-x-1 leading-none">
           <.username user={@user} />
           <span class="text-xs text-zinc-400">

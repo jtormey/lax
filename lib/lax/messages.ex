@@ -28,6 +28,7 @@ defmodule Lax.Messages do
       from m in Message,
         join: t in subquery(window_query),
         on: t.message_id == m.id and t.row_number == 1,
+        preload: [:sent_by_user],
         select: {m.channel_id, m}
 
     Map.new(Repo.all(messages_query))

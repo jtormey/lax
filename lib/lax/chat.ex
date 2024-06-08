@@ -77,6 +77,7 @@ defmodule Lax.Chat do
     else
       chat
     end
+    |> put_latest_message_in_direct_messages()
     |> put_unread_counts()
   end
 
@@ -91,13 +92,15 @@ defmodule Lax.Chat do
   end
 
   defp put_messages(chat) do
-    direct_message_ids = Enum.map(chat.direct_messages, & &1.id)
+    %{chat | messages: Messages.list(chat.current_channel)}
+    |> put_latest_message_in_direct_messages()
+  end
 
-    %{
-      chat
-      | messages: Messages.list(chat.current_channel),
-        latest_message_in_direct_messages: Messages.list_latest_in_channels(direct_message_ids)
-    }
+  defp put_latest_message_in_direct_messages(chat) do
+    direct_message_ids = Enum.map(chat.direct_messages, & &1.id)
+    latest = Messages.list_latest_in_channels(direct_message_ids)
+
+    %{chat | latest_message_in_direct_messages: latest}
   end
 
   defp put_unread_counts(chat) do

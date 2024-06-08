@@ -89,6 +89,10 @@ defmodule LaxWeb.DirectMessageLive do
     {:noreply, assign(socket, :current_user, user)}
   end
 
+  def handle_info({Lax.Messages, {:new_message, message}}, socket) do
+    {:noreply, update(socket, :chat, &Chat.receive_message(&1, message))}
+  end
+
   ## Helpers
 
   def sidebar_width(nil), do: 500
