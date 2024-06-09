@@ -211,11 +211,27 @@ defmodule LaxWeb.ChatLive.Components do
 
   attr :user, Lax.Users.User, required: true
   attr :time, :string, required: true
-  attr :message, :string, required: true
+  attr :text, :string, required: true
+  attr :compact, :boolean, required: true
+
+  def message(%{compact: true} = assigns) do
+    ~H"""
+    <div class="flex gap-2 hover:bg-zinc-800 px-4 py-1 group">
+      <div class="w-8 flex items-center justify-end invisible group-hover:visible">
+        <span class="text-xs text-zinc-400">
+          <%= @time %>
+        </span>
+      </div>
+      <div>
+        <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
+      </div>
+    </div>
+    """
+  end
 
   def message(assigns) do
     ~H"""
-    <div class="flex gap-2 hover:bg-zinc-800 px-4 py-2">
+    <div class="flex gap-2 hover:bg-zinc-800 px-4 pt-2 pb-1">
       <.user_profile user={@user} size={:md} class="mt-1" />
       <div class="flex-1">
         <div class="space-x-1 leading-none">
@@ -225,7 +241,7 @@ defmodule LaxWeb.ChatLive.Components do
           </span>
         </div>
         <div>
-          <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @message %></p>
+          <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
         </div>
       </div>
     </div>
@@ -276,13 +292,10 @@ defmodule LaxWeb.ChatLive.Components do
   def group_messages(messages) do
     messages
     |> Enum.chunk_by(& &1.sent_by_user_id)
-    |> Enum.map(fn chunk ->
-      text =
-        chunk
-        |> Enum.reverse()
-        |> Enum.map_join("\n", & &1.text)
-
-      %{List.last(chunk) | text: text}
+    |> Enum.flat_map(fn chunk ->
+      chunk
+      |> Enum.map(&%{&1 | compact: true})
+      |> List.update_at(-1, &%{&1 | compact: false})
     end)
   end
 end

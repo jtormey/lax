@@ -11,6 +11,8 @@ defmodule Lax.Messages.Message do
     belongs_to :channel, Lax.Channels.Channel
     belongs_to :sent_by_user, Lax.Users.User
 
+    field :compact, :boolean, default: false, virtual: true
+
     timestamps()
   end
 
@@ -27,6 +29,8 @@ defmodule Lax.Messages.Message do
       else
         {"America/New_York", "%I:%M %p (%Z)"}
       end
+
+    strfmt = if message.compact, do: "%I:%M", else: strfmt
 
     message.inserted_at
     |> DateTime.from_naive!("Etc/UTC")
