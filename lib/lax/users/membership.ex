@@ -17,12 +17,7 @@ defmodule Lax.Users.Membership do
   end
 
   def get_default_channel(nil) do
-    query =
-      from c in Channel,
-        limit: 1,
-        order_by: [asc: c.name]
-
-    Repo.one!(query)
+    Repo.get_by!(Channel, name: "general", type: :channel)
   end
 
   def get_default_channel(user) do
