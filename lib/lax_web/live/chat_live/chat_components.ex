@@ -115,8 +115,7 @@ defmodule LaxWeb.ChatLive.Components do
 
     ~H"""
     <.item_button {assigns}>
-      <% first_user = List.first(@users) %>
-      <.user_profile user={first_user} size={:xs} online={@online_fun.(first_user)} />
+      <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
       <div>
         <.intersperse :let={user} enum={@users}>
           <:separator><span class="text-zinc-400">,</span></:separator>

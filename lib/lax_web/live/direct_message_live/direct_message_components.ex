@@ -31,6 +31,7 @@ defmodule LaxWeb.DirectMessageLive.Components do
   attr :users, :list, required: true
   attr :latest_message, Lax.Messages.Message, required: true
   attr :selected, :boolean, default: false
+  attr :online_fun, :any, required: true
   attr :rest, :global, include: ~w(phx-click phx-target)
 
   def direct_message_item_row(assigns) do
@@ -44,7 +45,7 @@ defmodule LaxWeb.DirectMessageLive.Components do
     >
       <div class="flex p-4 border-b border-zinc-700">
         <div class="relative flex-1 flex gap-4">
-          <.user_profile user={hd(@users)} size={:md} class="mt-1" />
+          <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:md} class="mt-1" />
           <div class="flex-1 text-left">
             <.intersperse :let={user} enum={@users}>
               <:separator><span class="text-zinc-400">,</span></:separator>

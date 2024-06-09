@@ -24,7 +24,11 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
               :for={user <- @users}
               class="w-full flex gap-4 items-center border-b border-zinc-700 py-6"
             >
-              <.user_profile user={user} size={:md} />
+              <.user_profile
+                user={user}
+                online={LaxWeb.Presence.Live.online?(assigns, user)}
+                size={:md}
+              />
               <.username user={user} />
               <div class="flex-1" />
               <.button

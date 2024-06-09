@@ -31,6 +31,7 @@ defmodule LaxWeb.DirectMessageLive do
             :for={message <- @chat.latest_message_in_direct_messages}
             current_user={@current_user}
             users={Chat.direct_message_users(@chat, message.channel)}
+            online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
             latest_message={message}
             selected={Chat.current?(@chat, message.channel)}
             phx-click={JS.patch(~p"/direct-messages/#{message.channel}")}
@@ -49,6 +50,7 @@ defmodule LaxWeb.DirectMessageLive do
       id="new_direct_message"
       module={__MODULE__.NewDirectMessageComponent}
       current_user={@current_user}
+      tracked_users={@tracked_users}
     />
     """
   end
