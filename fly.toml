@@ -10,6 +10,7 @@ kill_signal = 'SIGTERM'
 [build]
 
 [deploy]
+  strategy = "bluegreen"
   release_command = '/app/bin/migrate'
 
 [env]
