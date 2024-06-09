@@ -11,7 +11,7 @@ const ControlTextarea = {
   onKeydown(event) {
     if (event.key === "Enter") {
       if (event.shiftKey) {
-        if (this.el && this.el.rows)  {
+        if (this.el && this.el.rows) {
           this.el.rows = this.el.rows + 1;
         }
       } else {
@@ -27,7 +27,10 @@ const ControlTextarea = {
           form.dispatchEvent(new Event("submit", { bubbles: true }));
 
           // refocus on input after timeout
-          setTimeout(() => event.target.focus(), 100);
+          setTimeout(() => {
+            this.el.value = "";
+            event.target.focus();
+          });
         }
       }
     }
