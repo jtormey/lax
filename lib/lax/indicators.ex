@@ -30,7 +30,7 @@ defmodule Lax.Indicators do
         join: cu in ChannelUser,
         on: [channel_id: m.channel_id, user_id: ^user.id],
         select: {m.channel_id, count(m)},
-        where: m.inserted_at > cu.last_viewed_at,
+        where: is_nil(cu.last_viewed_at) or m.inserted_at > cu.last_viewed_at,
         where: m.sent_by_user_id != ^user.id,
         group_by: m.channel_id
 
