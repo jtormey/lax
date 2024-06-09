@@ -18,30 +18,32 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
       </div>
 
       <div class="flex-1 relative overflow-y-scroll px-4">
-        <div class="flex-1 mx-auto max-w-sm py-16">
-          <div
-            :for={user <- @users}
-            class="w-full flex gap-4 items-center border-b border-zinc-700 py-6"
-          >
-            <.user_profile user={user} size={:md} />
-            <.username user={user} />
-            <div class="flex-1" />
-            <.button
-              :if={user.id not in @selected_user_ids}
-              variant={:action}
-              icon="hero-plus-circle-mini"
-              phx-click={JS.push("add", value: %{id: user.id}, target: @myself)}
+        <div class="absolute inset-0">
+          <div class="flex-1 mx-auto max-w-sm py-16">
+            <div
+              :for={user <- @users}
+              class="w-full flex gap-4 items-center border-b border-zinc-700 py-6"
             >
-              Add
-            </.button>
-            <.button
-              :if={user.id in @selected_user_ids}
-              class="group"
-              phx-click={JS.push("remove", value: %{id: user.id}, target: @myself)}
-            >
-              <span class="hidden group-hover:inline-block">Remove</span>
-              <span class="inline-block group-hover:hidden">Added</span>
-            </.button>
+              <.user_profile user={user} size={:md} />
+              <.username user={user} />
+              <div class="flex-1" />
+              <.button
+                :if={user.id not in @selected_user_ids}
+                variant={:action}
+                icon="hero-plus-circle-mini"
+                phx-click={JS.push("add", value: %{id: user.id}, target: @myself)}
+              >
+                Add
+              </.button>
+              <.button
+                :if={user.id in @selected_user_ids}
+                class="group"
+                phx-click={JS.push("remove", value: %{id: user.id}, target: @myself)}
+              >
+                <span class="hidden group-hover:inline-block">Remove</span>
+                <span class="inline-block group-hover:hidden">Added</span>
+              </.button>
+            </div>
           </div>
         </div>
       </div>

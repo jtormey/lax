@@ -9,7 +9,7 @@ defmodule LaxWeb.DirectMessageLive.Components do
 
   def notice(assigns) do
     ~H"""
-    <div class={["flex bg-zinc-900 border border-zinc-700 rounded p-2", @class]}>
+    <div class={["relative flex bg-zinc-900 border border-zinc-700 rounded p-2", @class]}>
       <span class="text-xs text-zinc-500">
         <%= render_slot(@inner_block) %>
       </span>

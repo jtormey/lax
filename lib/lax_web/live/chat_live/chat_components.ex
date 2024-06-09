@@ -218,12 +218,12 @@ defmodule LaxWeb.ChatLive.Components do
   def message(%{compact: true} = assigns) do
     ~H"""
     <div class="relative flex gap-2 hover:bg-zinc-800 px-4 py-1 group">
-      <div class="w-8 flex items-center justify-end invisible group-hover:visible">
+      <div class="w-8 flex items-start justify-end pt-0.5 invisible group-hover:visible">
         <span class="text-xs text-zinc-400">
           <%= @time %>
         </span>
       </div>
-      <div>
+      <div class="flex-1">
         <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
       </div>
       <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
@@ -244,7 +244,7 @@ defmodule LaxWeb.ChatLive.Components do
             <%= @time %>
           </span>
         </div>
-        <div>
+        <div class="flex-1">
           <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
         </div>
       </div>
