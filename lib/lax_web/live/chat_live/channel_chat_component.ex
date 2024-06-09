@@ -20,9 +20,7 @@ defmodule LaxWeb.ChatLive.ChannelChatComponent do
   end
 
   def mount(socket) do
-    {:ok,
-     socket
-     |> handle_form()}
+    {:ok, handle_form(socket)}
   end
 
   def handle_event("validate", %{"chat" => params}, socket) do
@@ -65,6 +63,6 @@ defmodule LaxWeb.ChatLive.ChannelChatComponent do
     |> validate_required([:text])
   end
 
-  def placeholder(%{type: :channel} = channel), do: "Message #{channel.name}"
+  def placeholder(%{type: :channel} = channel), do: "Message ##{channel.name}"
   def placeholder(%{type: :direct_message}), do: "Message group"
 end

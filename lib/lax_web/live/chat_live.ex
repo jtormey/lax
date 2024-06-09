@@ -75,7 +75,7 @@ defmodule LaxWeb.ChatLive do
 
       <.live_component
         :if={@current_user}
-        id="chat_component"
+        id={"chat_component_#{@chat.current_channel.id}"}
         module={LaxWeb.ChatLive.ChannelChatComponent}
         chat={@chat}
       />

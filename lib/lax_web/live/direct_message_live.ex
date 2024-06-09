@@ -72,7 +72,11 @@ defmodule LaxWeb.DirectMessageLive do
       />
     </.chat>
 
-    <.live_component id="chat_component" module={LaxWeb.ChatLive.ChannelChatComponent} chat={@chat} />
+    <.live_component
+      id={"chat_component_#{@chat.current_channel.id}"}
+      module={LaxWeb.ChatLive.ChannelChatComponent}
+      chat={@chat}
+    />
     """
   end
 
