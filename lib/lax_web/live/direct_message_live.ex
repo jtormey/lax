@@ -59,7 +59,7 @@ defmodule LaxWeb.DirectMessageLive do
 
     <.chat>
       <.message
-        :for={message <- @chat.messages}
+        :for={message <- group_messages(@chat.messages)}
         user={message.sent_by_user}
         time={Message.show_time(message, @current_user && @current_user.time_zone)}
         message={message.text}

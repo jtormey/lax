@@ -262,4 +262,12 @@ defmodule LaxWeb.ChatLive.Components do
     </button>
     """
   end
+
+  def group_messages(messages) do
+    messages
+    |> Enum.chunk_by(& &1.sent_by_user_id)
+    |> Enum.map(fn [first | _rest] = chunk ->
+      %{first | text: Enum.map_join(chunk, "\n", & &1.text)}
+    end)
+  end
 end
