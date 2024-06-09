@@ -160,12 +160,20 @@ defmodule Lax.Chat do
   end
 
   defp put_channels(chat) do
-    %{
+    chat =
+      %{
+        chat
+        | channels: Membership.list_channels(chat.user, :channel),
+          direct_messages: Membership.list_channels(chat.user, :direct_message),
+          direct_messages_other_users: Membership.other_users_in_direct_messages(chat.user)
+      }
+
+    if chat.user && chat.current_channel &&
+         chat.current_channel.id not in Enum.map(chat.channels, & &1.id) do
+      %{chat | current_channel: Membership.get_default_channel(chat.user)}
+    else
       chat
-      | channels: Membership.list_channels(chat.user, :channel),
-        direct_messages: Membership.list_channels(chat.user, :direct_message),
-        direct_messages_other_users: Membership.other_users_in_direct_messages(chat.user)
-    }
+    end
   end
 
   defp put_messages(chat) do
