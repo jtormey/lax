@@ -38,6 +38,7 @@ defmodule LaxWeb.ChatLive.ChannelFormComponent do
     case Channels.create_and_join(socket.assigns.current_user, params) do
       {:ok, channel} ->
         send(self(), {__MODULE__, {:create_channel, channel}})
+        Channels.broadcast_new_channel(socket.assigns.current_user, channel)
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->

@@ -33,7 +33,7 @@ defmodule LaxWeb.DirectMessageLive do
             current_user={@current_user}
             users={Chat.direct_message_users(@chat, message.channel)}
             latest_message={message}
-            selected={@live_action == :show and Chat.current?(@chat, message.channel)}
+            selected={Chat.current?(@chat, message.channel)}
             phx-click={JS.patch(~p"/direct-messages/#{message.channel}")}
           />
         </.direct_message_list>
@@ -88,7 +88,7 @@ defmodule LaxWeb.DirectMessageLive do
   end
 
   def handle_params(_params, _uri, socket) do
-    {:noreply, socket}
+    {:noreply, update(socket, :chat, &Chat.select_channel(&1, nil))}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
@@ -103,6 +103,10 @@ defmodule LaxWeb.DirectMessageLive do
   def handle_event("delete_message", %{"id" => message_id}, socket) do
     Messages.delete!(message_id, socket.assigns.current_user)
     {:noreply, update(socket, :chat, &Chat.reload_messages(&1))}
+  end
+
+  def handle_info({Lax.Channels, {:new_channel, _channel}}, socket) do
+    {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
   end
 
   def handle_info({Lax.Messages, {:new_message, message}}, socket) do

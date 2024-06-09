@@ -104,7 +104,11 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
             invite_user_ids: user_ids
           )
 
-        {:ok, _message} = Messages.send(channel, socket.assigns.current_user, %{text: text})
+        user_ids = [socket.assigns.current_user | user_ids]
+        Channels.broadcast_new_channel(user_ids, channel)
+
+        {:ok, message} = Messages.send(channel, socket.assigns.current_user, %{text: text})
+        Messages.broadcast_sent_message(channel, message)
 
         {:noreply, push_patch(socket, to: ~p"/direct-messages/#{channel}")}
 

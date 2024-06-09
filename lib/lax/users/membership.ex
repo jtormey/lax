@@ -30,7 +30,7 @@ defmodule Lax.Users.Membership do
       from c in Channel,
         join: cu in ChannelUser,
         on: [channel_id: c.id, user_id: ^user.id],
-        order_by: [desc: cu.last_viewed_at, asc: c.name],
+        order_by: [desc_nulls_last: cu.last_viewed_at, asc: c.name],
         limit: 1
 
     Repo.one!(query)

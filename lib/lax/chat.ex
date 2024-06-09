@@ -1,4 +1,5 @@
 defmodule Lax.Chat do
+  alias Lax.Channels
   alias Lax.Channels.Channel
   alias Lax.Indicators
   alias Lax.Messages
@@ -7,31 +8,41 @@ defmodule Lax.Chat do
 
   defstruct [
     :user,
+    # Channel records of type :channel, in order of asc: :name
     :channels,
+    # Channel records of type :direct_message, in order of desc: :inserted_at
     :direct_messages,
+    # Map of users associated with direct messages, keyed by channel_id
     :direct_messages_other_users,
+    # Current channel, of any type
     :current_channel,
+    # Current messages
     :messages,
+    # List of latest messages sent in :direct_message channels
     :latest_message_in_direct_messages,
-    :unread_counts
+    # Map of unread message countes, keyed by channel_id
+    :unread_counts,
+    # MapSet of channels that have already been subscribed to
+    :subscribed_channels
   ]
 
   def load(user, channel \\ nil) do
     %__MODULE__{
       user: user,
-      channels: Membership.list_channels(user, :channel),
-      direct_messages: Membership.list_channels(user, :direct_message),
-      direct_messages_other_users: Membership.other_users_in_direct_messages(user),
-      current_channel: channel || Membership.get_default_channel(user)
+      current_channel: channel || Membership.get_default_channel(user),
+      subscribed_channels: MapSet.new()
     }
     |> tap(&Indicators.mark_viewed(user, &1.current_channel.id))
-    |> subscribe_messages()
+    |> put_channels()
     |> put_messages()
+    |> put_latest_message_in_direct_messages()
     |> put_unread_counts()
+    |> subscribe_channels()
+    |> subscribe_messages()
   end
 
   def current?(chat, channel) do
-    chat.current_channel.id == channel.id
+    chat.current_channel && chat.current_channel.id == channel.id
   end
 
   def has_activity?(chat, channel) do
@@ -48,6 +59,12 @@ defmodule Lax.Chat do
 
   def latest_message(chat, channel) do
     Map.fetch!(chat.latest_message_in_direct_messages, channel.id)
+  end
+
+  def select_channel(chat, nil) do
+    chat
+    |> Map.put(:current_channel, nil)
+    |> put_messages()
   end
 
   def select_channel(chat, channel_id) do
@@ -74,12 +91,23 @@ defmodule Lax.Chat do
     chat
   end
 
+  def reload_channels(chat) do
+    chat
+    |> put_channels()
+    |> put_latest_message_in_direct_messages()
+    |> put_unread_counts()
+    |> subscribe_messages()
+  end
+
   def reload_messages(chat) do
-    put_messages(chat)
+    chat
+    |> put_messages()
+    |> put_latest_message_in_direct_messages()
+    |> put_unread_counts()
   end
 
   def receive_message(chat, message) do
-    if chat.current_channel.id == message.channel_id do
+    if chat.current_channel && chat.current_channel.id == message.channel_id do
       Indicators.mark_viewed(chat.user, message.channel_id)
       %{chat | messages: [message | chat.messages]}
     else
@@ -91,17 +119,41 @@ defmodule Lax.Chat do
 
   ## Private
 
-  defp subscribe_messages(chat) do
-    for channel <- chat.channels ++ chat.direct_messages do
-      Messages.subscribe_to_sent_messages(channel)
-    end
+  defp subscribe_channels(chat) do
+    Channels.subscribe_to_new_channels(chat.user)
 
     chat
   end
 
+  defp subscribe_messages(chat) do
+    channel_ids = MapSet.new(chat.channels ++ chat.direct_messages, & &1.id)
+
+    for channel_id <- MapSet.difference(channel_ids, chat.subscribed_channels) do
+      Messages.subscribe_to_sent_messages(channel_id)
+    end
+
+    for channel_id <- MapSet.difference(chat.subscribed_channels, channel_ids) do
+      Messages.unsubscribe_from_sent_messages(channel_id)
+    end
+
+    Map.put(chat, :subscribed_channels, channel_ids)
+  end
+
+  defp put_channels(chat) do
+    %{
+      chat
+      | channels: Membership.list_channels(chat.user, :channel),
+        direct_messages: Membership.list_channels(chat.user, :direct_message),
+        direct_messages_other_users: Membership.other_users_in_direct_messages(chat.user)
+    }
+  end
+
   defp put_messages(chat) do
-    %{chat | messages: Messages.list(chat.current_channel)}
-    |> put_latest_message_in_direct_messages()
+    if channel = chat.current_channel do
+      %{chat | messages: Messages.list(channel)}
+    else
+      %{chat | messages: []}
+    end
   end
 
   defp put_latest_message_in_direct_messages(chat) do

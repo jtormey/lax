@@ -145,15 +145,16 @@ defmodule LaxWeb.ChatLive do
     {:noreply, update(socket, :chat, &Chat.reload_messages(&1))}
   end
 
-  def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
-    {:noreply,
-     socket
-     |> assign(:chat, Chat.load(socket.assigns.current_user, channel))
-     |> assign(:modal, nil)}
+  def handle_info({ChannelFormComponent, {:create_channel, _channel}}, socket) do
+    {:noreply, assign(socket, :modal, nil)}
+  end
+
+  def handle_info({Lax.Channels, {:new_channel, _channel}}, socket) do
+    {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
   end
 
   def handle_info({ManageChannelsComponent, :update_channels}, socket) do
-    {:noreply, update(socket, :chat, &Chat.load(&1.user))}
+    {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
   end
 
   def handle_info({Lax.Messages, {:new_message, message}}, socket) do

@@ -46,4 +46,23 @@ defmodule Lax.Channels do
       end
     end)
   end
+
+  def subscribe_to_new_channels(user) do
+    Phoenix.PubSub.subscribe(Lax.PubSub, new_channels_topic(user))
+  end
+
+  def unsubscribe_from_new_channels(user) do
+    Phoenix.PubSub.unsubscribe(Lax.PubSub, new_channels_topic(user))
+  end
+
+  def broadcast_new_channel(users, channel) do
+    info = {__MODULE__, {:new_channel, channel}}
+
+    for user <- List.wrap(users) do
+      Phoenix.PubSub.broadcast(Lax.PubSub, new_channels_topic(user), info)
+    end
+  end
+
+  def new_channels_topic(%{id: user_id}), do: "new_channel:#{user_id}"
+  def new_channels_topic(user_id), do: "new_channel:#{user_id}"
 end

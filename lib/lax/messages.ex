@@ -63,7 +63,6 @@ defmodule Lax.Messages do
     Phoenix.PubSub.broadcast(Lax.PubSub, sent_messages_topic(channel), info)
   end
 
-  def sent_messages_topic(channel) do
-    "channel_messages:#{channel.id}"
-  end
+  def sent_messages_topic(%{id: channel_id}), do: "channel_messages:#{channel_id}"
+  def sent_messages_topic(channel_id), do: "channel_messages:#{channel_id}"
 end
