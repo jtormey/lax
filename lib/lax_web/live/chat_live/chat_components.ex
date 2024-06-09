@@ -106,7 +106,7 @@ defmodule LaxWeb.ChatLive.Components do
   attr :users, :list, required: true
   attr :selected, :boolean, default: false
   attr :active, :boolean, default: false
-  attr :online, :boolean, default: false
+  attr :online_fun, :any, required: true
   attr :unread_count, :integer, default: 0
   attr :rest, :global, include: ~w(phx-click phx-target)
 
@@ -115,13 +115,8 @@ defmodule LaxWeb.ChatLive.Components do
 
     ~H"""
     <.item_button {assigns}>
-      <div class="relative bg-red-100 rounded size-4">
-        <div class={[
-          "absolute -bottom-px -right-0.5 rounded-full size-1.5 ring-2 ring-zinc-950",
-          @online && "bg-emerald-500",
-          !@online && "border border-zinc-500 bg-zinc-950"
-        ]} />
-      </div>
+      <% first_user = List.first(@users) %>
+      <.user_profile user={first_user} size={:xs} online={@online_fun.(first_user)} />
       <div>
         <.intersperse :let={user} enum={@users}>
           <:separator><span class="text-zinc-400">,</span></:separator>

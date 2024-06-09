@@ -17,6 +17,7 @@ defmodule Lax.Application do
       # Start a worker by calling: Lax.Worker.start_link(arg)
       # {Lax.Worker, arg},
       # Start to serve requests, typically the last entry
+      LaxWeb.Presence,
       LaxWeb.Endpoint
     ]
 

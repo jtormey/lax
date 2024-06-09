@@ -44,6 +44,7 @@ defmodule LaxWeb.ChatLive do
               users={Chat.direct_message_users(@chat, channel)}
               selected={Chat.current?(@chat, channel)}
               active={Chat.has_activity?(@chat, channel)}
+              online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
               unread_count={Chat.unread_count(@chat, channel)}
               phx-click={JS.push("select_channel", value: %{id: channel.id})}
             />
@@ -111,7 +112,8 @@ defmodule LaxWeb.ChatLive do
      socket
      |> assign(:domain, :home)
      |> assign(:modal, nil)
-     |> assign(:chat, Chat.load(socket.assigns.current_user))}
+     |> assign(:chat, Chat.load(socket.assigns.current_user))
+     |> LaxWeb.Presence.Live.track_online_users()}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
