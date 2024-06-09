@@ -261,7 +261,7 @@ defmodule LaxWeb.ChatLive.Components do
 
   def chat_form(assigns) do
     ~H"""
-    <div class="px-4 pb-4">
+    <div class="relative px-4 pb-4">
       <.form for={@form} class="-mt-2" {@rest}>
         <.input
           type="textarea"
