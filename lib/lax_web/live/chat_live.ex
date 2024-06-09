@@ -20,7 +20,7 @@ defmodule LaxWeb.ChatLive do
           <.sidebar_section>
             <.sidebar_subheader on_click={@current_user && JS.push("show_manage_channels")}>
               Channels
-              <:actions>
+              <:actions :if={@current_user}>
                 <.icon_button icon="hero-plus" phx-click="show_new_channel" />
               </:actions>
             </.sidebar_subheader>
