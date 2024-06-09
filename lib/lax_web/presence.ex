@@ -38,6 +38,8 @@ defmodule LaxWeb.Presence do
        |> handle_joins(diff.joins)}
     end
 
+    def handle_info(_info, socket), do: {:cont, socket}
+
     defp handle_joins(socket, joins) do
       Enum.reduce(joins, socket, fn {user, %{metas: [meta | _]}}, socket ->
         update(socket, :tracked_users, &Map.put(&1, user, meta))
