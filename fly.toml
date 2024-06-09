@@ -31,6 +31,30 @@ kill_signal = 'SIGTERM'
     hard_limit = 1000
     soft_limit = 1000
 
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 750
+    soft_limit = 600
+
+  [[services.tcp_checks]]
+    interval = "10s"
+    timeout = "5s"
+    grace_period = "1s"
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
