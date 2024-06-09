@@ -91,11 +91,17 @@ defmodule LaxWeb.DirectMessageLive do
   end
 
   def handle_params(%{"id" => channel_id}, _uri, socket) do
-    {:noreply, update(socket, :chat, &Chat.select_channel(&1, channel_id))}
+    {:noreply,
+     socket
+     |> update(:chat, &Chat.select_channel(&1, channel_id))
+     |> put_page_title()}
   end
 
   def handle_params(_params, _uri, socket) do
-    {:noreply, update(socket, :chat, &Chat.select_channel(&1, nil))}
+    {:noreply,
+     socket
+     |> update(:chat, &Chat.select_channel(&1, nil))
+     |> assign(:page_title, "New message")}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do

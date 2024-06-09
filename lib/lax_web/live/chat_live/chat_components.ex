@@ -1,4 +1,5 @@
 defmodule LaxWeb.ChatLive.Components do
+  alias Lax.Chat
   use LaxWeb, :html
 
   import LaxWeb.UserLive.Components
@@ -290,6 +291,24 @@ defmodule LaxWeb.ChatLive.Components do
   end
 
   ## Helpers
+
+  def put_page_title(socket) do
+    chat = socket.assigns.chat
+
+    page_title =
+      case chat.current_channel do
+        nil ->
+          "Channels"
+
+        %{type: :channel} = channel ->
+          "##{channel.name}"
+
+        %{type: :direct_message} = channel ->
+          "#{Enum.map_join(Chat.direct_message_users(chat, channel), ", ", &"@#{&1.username}")}"
+      end
+
+    assign(socket, :page_title, page_title)
+  end
 
   def group_messages(messages) do
     messages

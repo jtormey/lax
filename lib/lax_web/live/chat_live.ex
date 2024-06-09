@@ -114,6 +114,7 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
+     |> put_page_title()
      |> LaxWeb.Presence.Live.track_online_users()}
   end
 
@@ -139,7 +140,10 @@ defmodule LaxWeb.ChatLive do
   end
 
   def handle_event("select_channel", %{"id" => channel_id}, socket) do
-    {:noreply, update(socket, :chat, &Chat.select_channel(&1, channel_id))}
+    {:noreply,
+     socket
+     |> update(:chat, &Chat.select_channel(&1, channel_id))
+     |> put_page_title()}
   end
 
   def handle_event("delete_message", %{"id" => message_id}, socket) do
