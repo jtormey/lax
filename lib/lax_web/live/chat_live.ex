@@ -5,6 +5,7 @@ defmodule LaxWeb.ChatLive do
   alias Lax.Chat
   alias Lax.Users
   alias LaxWeb.ChatLive.ChannelFormComponent
+  alias LaxWeb.ChatLive.ManageChannelsComponent
 
   import LaxWeb.ChatLive.Components
   import LaxWeb.DirectMessageLive.Components
@@ -16,7 +17,7 @@ defmodule LaxWeb.ChatLive do
         <.sidebar_header title="Workspace" />
         <.sidebar>
           <.sidebar_section>
-            <.sidebar_subheader>
+            <.sidebar_subheader on_click={@current_user && JS.push("show_manage_channels")}>
               Channels
               <:actions>
                 <.icon_button icon="hero-plus" phx-click="show_new_channel" />
@@ -84,6 +85,19 @@ defmodule LaxWeb.ChatLive do
         current_user={@current_user}
       />
     </.modal>
+
+    <.modal
+      :if={@modal == :manage_channels}
+      id="manage_channels_modal"
+      show
+      on_cancel={JS.push("hide_modal")}
+    >
+      <.live_component
+        id="manage_channels"
+        module={__MODULE__.ManageChannelsComponent}
+        current_user={@current_user}
+      />
+    </.modal>
     """
   end
 
@@ -108,6 +122,10 @@ defmodule LaxWeb.ChatLive do
     {:noreply, assign(socket, :modal, :new_channel)}
   end
 
+  def handle_event("show_manage_channels", _params, socket) do
+    {:noreply, assign(socket, :modal, :manage_channels)}
+  end
+
   def handle_event("hide_modal", _params, socket) do
     {:noreply, assign(socket, :modal, nil)}
   end
@@ -121,6 +139,10 @@ defmodule LaxWeb.ChatLive do
      socket
      |> assign(:chat, Chat.load(socket.assigns.current_user, channel))
      |> assign(:modal, nil)}
+  end
+
+  def handle_info({ManageChannelsComponent, :update_channels}, socket) do
+    {:noreply, update(socket, :chat, &Chat.load(&1.user))}
   end
 
   def handle_info({Lax.Messages, {:new_message, message}}, socket) do

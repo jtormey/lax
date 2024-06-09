@@ -96,6 +96,14 @@ defmodule Lax.Users.Membership do
     })
   end
 
+  def leave_channel!(user, channel) do
+    delete_query =
+      from ChannelUser,
+        where: [channel_id: ^channel.id, user_id: ^user.id]
+
+    Repo.delete_all(delete_query)
+  end
+
   def join_default_channels!(user) do
     channels =
       Repo.all(

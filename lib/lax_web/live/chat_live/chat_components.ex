@@ -63,15 +63,23 @@ defmodule LaxWeb.ChatLive.Components do
     """
   end
 
+  attr :on_click, JS, default: nil
   slot :actions, default: []
   slot :inner_block, required: true
 
   def sidebar_subheader(assigns) do
     ~H"""
     <div class="flex items-center justify-between rounded leading-none px-2 py-1">
-      <span class="text-sm font-semibold text-zinc-300 truncate">
+      <span :if={!@on_click} class="text-sm font-semibold text-zinc-300 truncate">
         <%= render_slot(@inner_block) %>
       </span>
+      <button
+        :if={@on_click}
+        phx-click={@on_click}
+        class="text-sm font-semibold text-zinc-300 truncate rounded hover:bg-zinc-700 px-1 -ml-1"
+      >
+        <%= render_slot(@inner_block) %>
+      </button>
       <%= render_slot(@actions) %>
     </div>
     """

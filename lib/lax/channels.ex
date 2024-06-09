@@ -6,6 +6,22 @@ defmodule Lax.Channels do
   alias Lax.Channels.Channel
   alias Lax.Users.Membership
 
+  def get!(id, type) do
+    Repo.one!(
+      from c in Channel,
+        where: c.id == ^id,
+        where: c.type == ^type
+    )
+  end
+
+  def list(:channel = type) do
+    Repo.all(
+      from c in Channel,
+        where: c.type == ^type,
+        order_by: c.name
+    )
+  end
+
   def create(attrs, opts \\ []) do
     %Channel{}
     |> Channel.changeset(Keyword.get(opts, :type, :channel), attrs)
