@@ -205,6 +205,7 @@ defmodule LaxWeb.ChatLive.Components do
   end
 
   attr :user, Lax.Users.User, required: true
+  attr :online, :boolean, required: true
   attr :time, :string, required: true
   attr :text, :string, required: true
   attr :compact, :boolean, required: true
@@ -231,7 +232,7 @@ defmodule LaxWeb.ChatLive.Components do
   def message(assigns) do
     ~H"""
     <div class="relative flex gap-2 hover:bg-zinc-800 px-4 pt-2 pb-1 group">
-      <.user_profile user={@user} size={:md} class="mt-1" />
+      <.user_profile user={@user} size={:md} class="mt-1" online={@online} />
       <div class="flex-1">
         <div class="space-x-1 leading-none">
           <.username user={@user} />

@@ -61,6 +61,7 @@ defmodule LaxWeb.DirectMessageLive do
       <.message
         :for={message <- group_messages(@chat.messages)}
         user={message.sent_by_user}
+        online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
         time={Message.show_time(message, @current_user && @current_user.time_zone)}
         text={message.text}
         compact={message.compact}
@@ -79,7 +80,8 @@ defmodule LaxWeb.DirectMessageLive do
     {:ok,
      socket
      |> assign(:domain, :direct_messages)
-     |> assign(:chat, Chat.load(socket.assigns.current_user))}
+     |> assign(:chat, Chat.load(socket.assigns.current_user))
+     |> LaxWeb.Presence.Live.track_online_users()}
   end
 
   def handle_params(%{"id" => channel_id}, _uri, socket) do

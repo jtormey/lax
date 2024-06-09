@@ -62,6 +62,7 @@ defmodule LaxWeb.ChatLive do
         <.message
           :for={message <- group_messages(@chat.messages)}
           user={message.sent_by_user}
+          online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
           time={Message.show_time(message, @current_user && @current_user.time_zone)}
           text={message.text}
           compact={message.compact}
