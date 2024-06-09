@@ -2,7 +2,6 @@ defmodule LaxWeb.ChatLive do
   use LaxWeb, {:live_view, layout: :chat}
 
   alias Lax.Chat
-  alias Lax.Messages
   alias Lax.Messages.Message
   alias Lax.Users
   alias LaxWeb.ChatLive.ChannelFormComponent
@@ -141,8 +140,7 @@ defmodule LaxWeb.ChatLive do
   end
 
   def handle_event("delete_message", %{"id" => message_id}, socket) do
-    Messages.delete!(message_id, socket.assigns.current_user)
-    {:noreply, update(socket, :chat, &Chat.reload_messages(&1))}
+    {:noreply, update(socket, :chat, &Chat.delete_message(&1, message_id))}
   end
 
   def handle_info({ChannelFormComponent, {:create_channel, _channel}}, socket) do
@@ -157,8 +155,12 @@ defmodule LaxWeb.ChatLive do
     {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
   end
 
-  def handle_info({Lax.Messages, {:new_message, message}}, socket) do
-    {:noreply, update(socket, :chat, &Chat.receive_message(&1, message))}
+  def handle_info({Lax.Messages, {:sent_message, message}}, socket) do
+    {:noreply, update(socket, :chat, &Chat.receive_sent_message(&1, message))}
+  end
+
+  def handle_info({Lax.Messages, {:deleted_message, channel_message_ids}}, socket) do
+    {:noreply, update(socket, :chat, &Chat.receive_deleted_message(&1, channel_message_ids))}
   end
 
   ## Helpers

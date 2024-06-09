@@ -37,6 +37,5 @@ defmodule Lax.Indicators do
     query
     |> Repo.all()
     |> Map.new()
-    |> IO.inspect()
   end
 end

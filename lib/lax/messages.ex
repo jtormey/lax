@@ -59,7 +59,12 @@ defmodule Lax.Messages do
   end
 
   def broadcast_sent_message(channel, message) do
-    info = {__MODULE__, {:new_message, message}}
+    info = {__MODULE__, {:sent_message, message}}
+    Phoenix.PubSub.broadcast(Lax.PubSub, sent_messages_topic(channel), info)
+  end
+
+  def broadcast_deleted_message(channel, message_id) do
+    info = {__MODULE__, {:deleted_message, {channel.id, message_id}}}
     Phoenix.PubSub.broadcast(Lax.PubSub, sent_messages_topic(channel), info)
   end
 
