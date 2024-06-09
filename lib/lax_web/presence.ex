@@ -10,13 +10,13 @@ defmodule LaxWeb.Presence do
     @presence "online_users"
 
     def track_online_users(socket) do
-      import Phoenix.Component
-
       if connected?(socket) do
-        {:ok, _} =
-          LaxWeb.Presence.track(self(), @presence, socket.assigns.current_user.id, %{
-            online_at: inspect(System.system_time(:second))
-          })
+        if user = socket.assigns.current_user do
+          {:ok, _} =
+            LaxWeb.Presence.track(self(), @presence, user.id, %{
+              online_at: inspect(System.system_time(:second))
+            })
+        end
 
         Phoenix.PubSub.subscribe(Lax.PubSub, @presence)
       end
