@@ -213,10 +213,11 @@ defmodule LaxWeb.ChatLive.Components do
   attr :time, :string, required: true
   attr :text, :string, required: true
   attr :compact, :boolean, required: true
+  attr :on_delete, JS, default: nil
 
   def message(%{compact: true} = assigns) do
     ~H"""
-    <div class="flex gap-2 hover:bg-zinc-800 px-4 py-1 group">
+    <div class="relative flex gap-2 hover:bg-zinc-800 px-4 py-1 group">
       <div class="w-8 flex items-center justify-end invisible group-hover:visible">
         <span class="text-xs text-zinc-400">
           <%= @time %>
@@ -225,13 +226,16 @@ defmodule LaxWeb.ChatLive.Components do
       <div>
         <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
       </div>
+      <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
+        <.icon_button icon="hero-trash" phx-click={@on_delete} />
+      </div>
     </div>
     """
   end
 
   def message(assigns) do
     ~H"""
-    <div class="flex gap-2 hover:bg-zinc-800 px-4 pt-2 pb-1">
+    <div class="relative flex gap-2 hover:bg-zinc-800 px-4 pt-2 pb-1 group">
       <.user_profile user={@user} size={:md} class="mt-1" />
       <div class="flex-1">
         <div class="space-x-1 leading-none">
@@ -243,6 +247,9 @@ defmodule LaxWeb.ChatLive.Components do
         <div>
           <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
         </div>
+      </div>
+      <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
+        <.icon_button icon="hero-trash" phx-click={@on_delete} />
       </div>
     </div>
     """

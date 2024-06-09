@@ -74,6 +74,10 @@ defmodule Lax.Chat do
     chat
   end
 
+  def reload_messages(chat) do
+    put_messages(chat)
+  end
+
   def receive_message(chat, message) do
     if chat.current_channel.id == message.channel_id do
       Indicators.mark_viewed(chat.user, message.channel_id)

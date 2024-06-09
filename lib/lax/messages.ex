@@ -42,6 +42,14 @@ defmodule Lax.Messages do
     |> Repo.insert()
   end
 
+  def delete!(id, user) do
+    delete_query =
+      from Message,
+        where: [id: ^id, sent_by_user_id: ^user.id]
+
+    Repo.delete_all(delete_query)
+  end
+
   def subscribe_to_sent_messages(channel) do
     Phoenix.PubSub.subscribe(Lax.PubSub, sent_messages_topic(channel))
   end

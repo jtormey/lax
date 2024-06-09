@@ -1,8 +1,9 @@
 defmodule LaxWeb.ChatLive do
-  alias Lax.Messages.Message
   use LaxWeb, {:live_view, layout: :chat}
 
   alias Lax.Chat
+  alias Lax.Messages
+  alias Lax.Messages.Message
   alias Lax.Users
   alias LaxWeb.ChatLive.ChannelFormComponent
   alias LaxWeb.ChatLive.ManageChannelsComponent
@@ -64,6 +65,10 @@ defmodule LaxWeb.ChatLive do
           time={Message.show_time(message, @current_user && @current_user.time_zone)}
           text={message.text}
           compact={message.compact}
+          on_delete={
+            @current_user && @current_user.id == message.sent_by_user_id &&
+              JS.push("delete_message", value: %{id: message.id})
+          }
         />
       </.chat>
 
@@ -133,6 +138,11 @@ defmodule LaxWeb.ChatLive do
 
   def handle_event("select_channel", %{"id" => channel_id}, socket) do
     {:noreply, update(socket, :chat, &Chat.select_channel(&1, channel_id))}
+  end
+
+  def handle_event("delete_message", %{"id" => message_id}, socket) do
+    Messages.delete!(message_id, socket.assigns.current_user)
+    {:noreply, update(socket, :chat, &Chat.reload_messages(&1))}
   end
 
   def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
