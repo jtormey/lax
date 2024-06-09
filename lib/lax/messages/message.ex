@@ -13,7 +13,7 @@ defmodule Lax.Messages.Message do
 
     field :compact, :boolean, default: false, virtual: true
 
-    timestamps()
+    timestamps(type: :naive_datetime_usec)
   end
 
   def changeset(message, attrs) do
