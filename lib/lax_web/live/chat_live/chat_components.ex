@@ -263,11 +263,18 @@ defmodule LaxWeb.ChatLive.Components do
     """
   end
 
+  ## Helpers
+
   def group_messages(messages) do
     messages
     |> Enum.chunk_by(& &1.sent_by_user_id)
-    |> Enum.map(fn [first | _rest] = chunk ->
-      %{first | text: Enum.map_join(chunk, "\n", & &1.text)}
+    |> Enum.map(fn chunk ->
+      text =
+        chunk
+        |> Enum.reverse()
+        |> Enum.map_join("\n", & &1.text)
+
+      %{List.last(chunk) | text: text}
     end)
   end
 end
