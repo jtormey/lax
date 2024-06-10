@@ -116,7 +116,8 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
         {:ok, message} = Messages.send(channel, socket.assigns.current_user, %{text: text})
         Messages.broadcast_sent_message(channel, message)
 
-        {:noreply, push_patch(socket, to: ~p"/direct-messages/#{channel}")}
+        send(self(), {__MODULE__, {:create_direct_message, channel}})
+        {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, put_form(socket, changeset)}

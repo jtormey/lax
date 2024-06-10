@@ -28,7 +28,7 @@ defmodule LaxWeb.ChatLive do
               name={channel.name}
               selected={Chat.current?(@chat, channel)}
               active={Chat.has_activity?(@chat, channel)}
-              phx-click={JS.push("select_channel", value: %{id: channel.id})}
+              phx-click={JS.patch(~p"/chat/#{channel.id}")}
             />
           </.sidebar_section>
 
@@ -46,7 +46,7 @@ defmodule LaxWeb.ChatLive do
               active={Chat.has_activity?(@chat, channel)}
               online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
               unread_count={Chat.unread_count(@chat, channel)}
-              phx-click={JS.push("select_channel", value: %{id: channel.id})}
+              phx-click={JS.patch(~p"/chat/#{channel.id}")}
             />
           </.sidebar_section>
 
@@ -114,8 +114,18 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
-     |> put_page_title()
      |> LaxWeb.Presence.Live.track_online_users()}
+  end
+
+  def handle_params(%{"id" => channel_id}, _uri, socket) do
+    {:noreply,
+     socket
+     |> update(:chat, &Chat.select_channel(&1, channel_id))
+     |> put_page_title()}
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, put_page_title(socket)}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
@@ -139,26 +149,22 @@ defmodule LaxWeb.ChatLive do
     {:noreply, assign(socket, :modal, nil)}
   end
 
-  def handle_event("select_channel", %{"id" => channel_id}, socket) do
-    {:noreply,
-     socket
-     |> update(:chat, &Chat.select_channel(&1, channel_id))
-     |> put_page_title()}
-  end
-
   def handle_event("delete_message", %{"id" => message_id}, socket) do
     {:noreply, update(socket, :chat, &Chat.delete_message(&1, message_id))}
   end
 
-  def handle_info({ChannelFormComponent, {:create_channel, _channel}}, socket) do
-    {:noreply, assign(socket, :modal, nil)}
-  end
-
-  def handle_info({Lax.Channels, {:new_channel, _channel}}, socket) do
-    {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
+  def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
+    {:noreply,
+     socket
+     |> assign(:modal, nil)
+     |> push_patch(to: ~p"/chat/#{channel}")}
   end
 
   def handle_info({ManageChannelsComponent, :update_channels}, socket) do
+    {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
+  end
+
+  def handle_info({Lax.Channels, {:new_channel, _channel}}, socket) do
     {:noreply, update(socket, :chat, &Chat.reload_channels(&1))}
   end
 

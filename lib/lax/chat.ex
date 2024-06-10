@@ -1,9 +1,7 @@
 defmodule Lax.Chat do
   alias Lax.Channels
-  alias Lax.Channels.Channel
   alias Lax.Indicators
   alias Lax.Messages
-  alias Lax.Repo
   alias Lax.Users.Membership
 
   defstruct [
@@ -78,7 +76,7 @@ defmodule Lax.Chat do
       |> put_messages()
       |> put_unread_counts()
     else
-      load(chat.user, Repo.get!(Channel, channel_id))
+      raise "Tried to join a channel that is not preloaded"
     end
   end
 
