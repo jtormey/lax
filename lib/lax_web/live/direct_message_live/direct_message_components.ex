@@ -21,7 +21,7 @@ defmodule LaxWeb.DirectMessageLive.Components do
 
   def direct_message_list(assigns) do
     ~H"""
-    <div class="flex-1 overflow-y-scroll">
+    <div class="flex-1 overflow-y-scroll no-scrollbar">
       <%= render_slot(@inner_block) %>
     </div>
     """

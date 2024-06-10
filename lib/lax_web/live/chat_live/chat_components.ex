@@ -48,7 +48,7 @@ defmodule LaxWeb.ChatLive.Components do
 
   def sidebar(assigns) do
     ~H"""
-    <div class="flex-1 overflow-y-scroll py-4 px-2">
+    <div class="flex-1 overflow-y-scroll no-scrollbar py-4 px-2">
       <%= render_slot(@inner_block) %>
     </div>
     """
@@ -198,7 +198,7 @@ defmodule LaxWeb.ChatLive.Components do
 
   def chat(assigns) do
     ~H"""
-    <div class="flex-1 flex flex-col-reverse py-4 overflow-y-scroll">
+    <div class="flex-1 flex flex-col-reverse py-4 overflow-y-scroll no-scrollbar">
       <%= render_slot(@inner_block) %>
     </div>
     """

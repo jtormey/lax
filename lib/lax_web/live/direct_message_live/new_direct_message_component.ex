@@ -17,7 +17,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
         </.header>
       </div>
 
-      <div class="flex-1 relative overflow-y-scroll px-4">
+      <div class="flex-1 relative overflow-y-scroll no-scrollbar px-4">
         <div class="absolute inset-0">
           <div class="flex-1 mx-auto max-w-sm py-16">
             <div
