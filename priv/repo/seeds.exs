@@ -10,8 +10,10 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-{:ok, channel} = Lax.Channels.create(%{name: "general"})
-Lax.Repo.insert!(%Lax.Channels.DefaultChannel{channel: channel})
+unless Lax.Repo.exists?(Lax.Channels.DefaultChannel) do
+  {:ok, channel} = Lax.Channels.create(%{name: "general"})
+  Lax.Repo.insert!(%Lax.Channels.DefaultChannel{channel: channel})
 
-{:ok, channel} = Lax.Channels.create(%{name: "random"})
-Lax.Repo.insert!(%Lax.Channels.DefaultChannel{channel: channel})
+  {:ok, channel} = Lax.Channels.create(%{name: "random"})
+  Lax.Repo.insert!(%Lax.Channels.DefaultChannel{channel: channel})
+end

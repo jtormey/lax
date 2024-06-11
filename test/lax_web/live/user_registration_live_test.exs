@@ -28,11 +28,11 @@ defmodule LaxWeb.UserRegistrationLiveTest do
       result =
         lv
         |> element("#registration_form")
-        |> render_change(user: %{"email" => "with spaces", "password" => "too short"})
+        |> render_change(user: %{"email" => "with spaces", "password" => "short"})
 
       assert result =~ "Register"
       assert result =~ "must have the @ sign and no spaces"
-      assert result =~ "should be at least 12 character"
+      assert result =~ "should be at least 8 character"
     end
   end
 
@@ -41,8 +41,8 @@ defmodule LaxWeb.UserRegistrationLiveTest do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
       email = unique_user_email()
-      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
-      render_submit(form)
+      form = form(lv, "#registration_form", user: valid_user_attributes(email: email, time_zone: ""))
+      render_submit(form, %{"user" => %{"time_zone" => "Europe/Paris"}})
       conn = follow_trigger_action(form, conn)
 
       assert redirected_to(conn) == ~p"/"
