@@ -30,12 +30,24 @@ defmodule Lax.Messages.Message do
         {"America/New_York", "%I:%M %p (%Z)"}
       end
 
-    strfmt = if message.compact, do: "%I:%M", else: strfmt
+    strfmt =
+      cond do
+        message.compact -> "%I:%M"
+        before_beggining_of_day?(message.inserted_at) -> "#{strfmt}, %m/%d/%y"
+        true -> strfmt
+      end
 
     message.inserted_at
     |> DateTime.from_naive!("Etc/UTC")
     |> DateTime.shift_zone!(time_zone)
     |> Calendar.strftime(strfmt)
     |> String.trim_leading("0")
+  end
+
+  def before_beggining_of_day?(naive_date_time) do
+    NaiveDateTime.before?(
+      naive_date_time,
+      NaiveDateTime.beginning_of_day(NaiveDateTime.utc_now())
+    )
   end
 end
