@@ -1,5 +1,6 @@
 defmodule LaxWeb.UserForgotPasswordLive do
   use LaxWeb, {:live_view, layout: :chat}
+  use LaxNative, :live_view
 
   alias Lax.Users
 

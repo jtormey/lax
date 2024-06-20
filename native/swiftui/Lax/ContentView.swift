@@ -15,7 +15,7 @@ struct ContentView: View {
                 production: URL(string: "https://example.com")!
             ),
             addons: [
-                LiveFormRegistry<_>.self
+                .liveForm
             ]
         ) {
             ConnectingView()

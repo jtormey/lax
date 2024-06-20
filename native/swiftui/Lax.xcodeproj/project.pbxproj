@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -157,8 +157,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 22CDBD4027A2B212D9614AD1 /* Build configuration list for PBXProject "Lax" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -473,16 +471,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/liveview-native/liveview-client-swiftui";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = "0.3.0-rc.1";
+				branch = main;
+				kind = branch;
 			};
 		};
 		61BBA657666FE6F23054DE6A /* XCRemoteSwiftPackageReference "liveview-native-live-form" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/liveview-native/liveview-native-live-form";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = "0.3.0-rc.1";
+				branch = "addons-macro";
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

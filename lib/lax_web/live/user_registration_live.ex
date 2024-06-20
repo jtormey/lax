@@ -1,5 +1,6 @@
 defmodule LaxWeb.UserRegistrationLive do
   use LaxWeb, {:live_view, layout: :chat}
+  use LaxNative, :live_view
 
   alias Lax.Users
   alias Lax.Users.User

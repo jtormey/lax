@@ -1,5 +1,6 @@
 defmodule LaxWeb.UserLoginLive do
   use LaxWeb, {:live_view, layout: :chat}
+  use LaxNative, :live_view
 
   def render(assigns) do
     ~H"""

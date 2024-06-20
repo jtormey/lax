@@ -1,5 +1,6 @@
 defmodule LaxWeb.ChatLive do
   use LaxWeb, {:live_view, layout: :chat}
+  use LaxNative, :live_view
 
   alias Lax.Chat
   alias Lax.Messages.Message
