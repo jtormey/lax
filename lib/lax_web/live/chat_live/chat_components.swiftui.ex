@@ -19,7 +19,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     ~LVN"""
     <Group {@rest} style='contextMenu(menuItems: :user_menu);'>
       <HStack template={:user_menu}>
-      <.link :for={option <- @option} navigate={option}>
+      <.link :for={option <- @option} navigate={option[:navigate]}>
         <Label systemImage={option[:system_image]}>
           <%= render_slot(option) %>
         </Label>
@@ -41,6 +41,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   end
 
   attr :title, :string, required: true
+  slot :footer, default: []
   slot :inner_block, required: true
 
   def workspace_section(assigns) do
@@ -48,6 +49,9 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     <Section>
       <Text template="header">
         <%= @title %>
+      </Text>
+      <Text :if={@footer != []} template="footer">
+        <%= render_slot(@footer) %>
       </Text>
       <%= render_slot(@inner_block) %>
     </Section>

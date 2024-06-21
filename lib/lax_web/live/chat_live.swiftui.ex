@@ -44,6 +44,9 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           unread_count={Chat.unread_count(@chat, channel)}
           navigate={~p"/chat/#{channel}"}
         />
+        <:footer :if={!@current_user}>
+          Sign in to use the direct messaging feature.
+        </:footer>
       </.workspace_section>
     </.workspace_list>
     """
