@@ -63,6 +63,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   attr :name, :string, required: true
   attr :active, :boolean, default: false
+  attr :unread_count, :integer, default: 0
   attr :rest, :global, include: ~w(navigate)
 
   def channel_item(assigns) do
@@ -71,7 +72,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       <LabeledContent style="badge(:badge)">
         <Text template="label"># <%= @name %></Text>
         <Text :if={@active} template={:badge}>
-          <%= "x" %>
+          <%= @unread_count %>
         </Text>
       </LabeledContent>
     </.link>

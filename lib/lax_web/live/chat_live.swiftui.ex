@@ -31,6 +31,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           :for={channel <- @chat.channels}
           name={channel.name}
           active={Chat.has_activity?(@chat, channel)}
+          unread_count={Chat.unread_count(@chat, channel)}
           navigate={~p"/chat/#{channel}"}
         />
       </.workspace_section>
