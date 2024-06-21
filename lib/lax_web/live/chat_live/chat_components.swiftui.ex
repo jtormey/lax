@@ -1,10 +1,13 @@
 defmodule LaxWeb.ChatLive.Components.SwiftUI do
   use LiveViewNative.Component
 
+  import LiveViewNative.LiveForm.Component
   import LiveViewNative.SwiftUI.Component
 
   import LaxWeb.CoreComponents.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
+
+  alias LaxWeb.ChatLive.ChannelChatComponent
 
   attr :rest, :global
 
@@ -124,7 +127,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   def chat(assigns) do
     ~LVN"""
-    <ScrollView style="defaultScrollAnchor(.bottom)">
+    <ScrollView style="frame(maxHeight: .infinity); defaultScrollAnchor(.bottom);">
       <VStack
         alignment="leading"
         style='frame(maxWidth: .infinity, alignment: .leading); animation(.default, value: attr("animation_key"));'
@@ -202,6 +205,26 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         <Spacer />
       </HStack>
     </Group>
+    """
+  end
+
+  attr :chat, Lax.Chat, required: true
+  attr :form, Phoenix.HTML.Form, required: true
+  attr :rest, :global
+
+  def chat_form(assigns) do
+    ~LVN"""
+    <.form {@rest} for={@form}>
+      <Form style="frame(height: 168);">
+        <.input
+          field={@form[:text]}
+          placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
+        />
+        <.button type="submit">
+          Submit
+        </.button>
+      </Form>
+    </.form>
     """
   end
 end

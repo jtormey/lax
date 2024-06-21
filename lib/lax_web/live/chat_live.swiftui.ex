@@ -68,6 +68,14 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         on_delete={@current_user && @current_user.id == message.sent_by_user_id && "delete_message"}
       />
     </.chat>
+
+    <.chat_form
+      :if={@current_user}
+      chat={@chat}
+      form={@chat_form}
+      phx-validate="swiftui_validate"
+      phx-submit="swiftui_submit"
+    />
     """
   end
 end

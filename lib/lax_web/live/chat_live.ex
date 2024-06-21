@@ -5,6 +5,7 @@ defmodule LaxWeb.ChatLive do
   alias Lax.Chat
   alias Lax.Messages.Message
   alias Lax.Users
+  alias LaxWeb.ChatLive.ChannelChatComponent
   alias LaxWeb.ChatLive.ChannelFormComponent
   alias LaxWeb.ChatLive.ManageChannelsComponent
 
@@ -115,6 +116,7 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
+     |> ChannelChatComponent.handle_form()
      |> LaxWeb.Presence.Live.track_online_users()}
   end
 
@@ -153,6 +155,14 @@ defmodule LaxWeb.ChatLive do
   def handle_event("delete_message", %{"id" => message_id}, socket) do
     {:noreply, update(socket, :chat, &Chat.delete_message(&1, message_id))}
   end
+
+  ## SwiftUI
+
+  def handle_event("swiftui_" <> event, params, socket) do
+    ChannelChatComponent.handle_event(event, params, socket)
+  end
+
+  ## /SwiftUI
 
   def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
     {:noreply,
