@@ -12,7 +12,8 @@ struct ContentView: View {
         #LiveView(
             .automatic(
                 development: .localhost(path: "/"),
-                production: URL(string: "https://example.com")!
+                // development: URL(string: "https://lax.ngrok.io")!,
+                production: URL(string: "https://lax.fly.dev")!
             ),
             addons: [
                 .liveForm
