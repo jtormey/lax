@@ -6,6 +6,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
   import LaxWeb.ChatLive.Components, only: [group_messages: 1]
   import LaxWeb.ChatLive.Components.SwiftUI
+  import LaxWeb.DirectMessageLive.Components.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
   def render(%{live_action: :chat} = assigns, _interface) do
@@ -25,31 +26,49 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </:actions>
     </.header>
 
-    <.workspace_list>
-      <.workspace_section title="Channels">
-        <.channel_item
-          :for={channel <- @chat.channels}
-          name={channel.name}
-          active={Chat.has_activity?(@chat, channel)}
-          unread_count={Chat.unread_count(@chat, channel)}
-          navigate={~p"/chat/#{channel}"}
-        />
-      </.workspace_section>
+    <.tab_bar>
+      <.tab name="Home" icon_system_name="house">
+        <.workspace_list>
+          <.workspace_section title="Channels">
+            <.channel_item
+              :for={channel <- @chat.channels}
+              name={channel.name}
+              active={Chat.has_activity?(@chat, channel)}
+              unread_count={Chat.unread_count(@chat, channel)}
+              navigate={~p"/chat/#{channel}"}
+            />
+          </.workspace_section>
 
-      <.workspace_section title="Direct messages">
-        <.direct_message_item
-          :for={channel <- @chat.direct_messages}
-          users={Chat.direct_message_users(@chat, channel)}
-          active={Chat.has_activity?(@chat, channel)}
-          online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
-          unread_count={Chat.unread_count(@chat, channel)}
-          navigate={~p"/chat/#{channel}"}
-        />
-        <:footer :if={!@current_user}>
-          Sign in to use the direct messaging feature.
-        </:footer>
-      </.workspace_section>
-    </.workspace_list>
+          <.workspace_section title="Direct messages">
+            <.direct_message_item
+              :for={channel <- @chat.direct_messages}
+              users={Chat.direct_message_users(@chat, channel)}
+              active={Chat.has_activity?(@chat, channel)}
+              online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+              unread_count={Chat.unread_count(@chat, channel)}
+              navigate={~p"/chat/#{channel}"}
+            />
+            <:footer :if={!@current_user}>
+              Sign in to use the direct messaging feature.
+            </:footer>
+          </.workspace_section>
+        </.workspace_list>
+      </.tab>
+
+      <.tab name="DMs" icon_system_name="message">
+        <.direct_message_list>
+          <.direct_message_item_row
+            :for={message <- @chat.latest_message_in_direct_messages}
+            current_user={@current_user}
+            users={Chat.direct_message_users(@chat, message.channel)}
+            online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+            latest_message={message}
+            selected={Chat.current?(@chat, message.channel)}
+            navigate={~p"/chat/#{message.channel}"}
+          />
+        </.direct_message_list>
+      </.tab>
+    </.tab_bar>
     """
   end
 

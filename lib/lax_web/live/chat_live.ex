@@ -158,6 +158,10 @@ defmodule LaxWeb.ChatLive do
 
   ## SwiftUI
 
+  def handle_event("swiftui_navigate", %{"to" => to}, socket) do
+    {:noreply, push_navigate(socket, to: to)}
+  end
+
   def handle_event("swiftui_" <> event, params, socket) do
     ChannelChatComponent.handle_event(event, params, socket)
   end
