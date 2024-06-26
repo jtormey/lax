@@ -148,10 +148,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   attr :animation_key, :any
   slot :inner_block
+  slot :bottom_bar
 
   def chat(assigns) do
     ~LVN"""
-    <ScrollView style="frame(maxHeight: .infinity); defaultScrollAnchor(.bottom);">
+    <ScrollView style="defaultScrollAnchor(.bottom); safeAreaInset(edge: .bottom, content: :bottom_bar);">
       <VStack
         alignment="leading"
         style='frame(maxWidth: .infinity, alignment: .leading); animation(.default, value: attr("animation_key"));'
@@ -159,6 +160,9 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       >
         <%= render_slot(@inner_block) %>
       </VStack>
+      <Group template={:bottom_bar} style="background(.bar);">
+        <%= render_slot(@bottom_bar) %>
+      </Group>
     </ScrollView>
     """
   end
@@ -238,22 +242,36 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   def chat_form(assigns) do
     ~LVN"""
-    <Group style="background(.bar);">
-      <HStack style="padding();">
-        <.form {@rest} for={@form}>
-          <.input
-            field={@form[:text]}
-            placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
-          />
-          <LiveSubmitButton
-            style="buttonStyle(.borderedProminent);"
-            after-submit="clear"
-          >
-            <Image systemName="paperplane" style="padding(4);" />
-          </LiveSubmitButton>
-        </.form>
-      </HStack>
-    </Group>
+    <HStack style="padding();">
+      <.form {@rest} for={@form}>
+        <.input
+          field={@form[:text]}
+          placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
+        />
+        <LiveSubmitButton
+          style="buttonStyle(.borderedProminent);"
+          after-submit="clear"
+        >
+          <Image systemName="paperplane" style="padding(4);" />
+        </LiveSubmitButton>
+      </.form>
+    </HStack>
+    """
+  end
+
+  def chat_signed_out_notice(assigns) do
+    ~LVN"""
+    <Text
+      style={[
+        "font(.subheadline);",
+        "padding(.horizontal); padding(.vertical, 12);",
+        "overlay(content: :border);",
+        "padding(.horizontal); padding(.vertical);",
+      ]}
+    >
+      <RoundedRectangle template={:border} cornerRadius={4} style="stroke(.gray);" />
+      You are viewing this channel anonymously. Sign in to send messages.
+    </Text>
     """
   end
 end

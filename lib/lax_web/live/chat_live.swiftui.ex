@@ -90,28 +90,17 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         compact={message.compact}
         on_delete={@current_user && @current_user.id == message.sent_by_user_id && "delete_message"}
       />
+      <:bottom_bar>
+        <.chat_form
+          :if={@current_user}
+          chat={@chat}
+          form={@chat_form}
+          phx-validate="swiftui_validate"
+          phx-submit="swiftui_submit"
+        />
+        <.chat_signed_out_notice :if={!@current_user} />
+      </:bottom_bar>
     </.chat>
-
-    <.chat_form
-      :if={@current_user}
-      chat={@chat}
-      form={@chat_form}
-      phx-validate="swiftui_validate"
-      phx-submit="swiftui_submit"
-    />
-
-    <Text
-      :if={!@current_user}
-      style={[
-        "font(.subheadline);",
-        "padding(.horizontal); padding(.vertical, 12);",
-        "overlay(content: :border);",
-        "padding(.horizontal); padding(.bottom);",
-      ]}
-    >
-      <RoundedRectangle template={:border} cornerRadius={4} style="stroke(.gray);" />
-      You are viewing this channel anonymously. Sign in to send messages.
-    </Text>
     """
   end
 end
