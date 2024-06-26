@@ -56,7 +56,10 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </.tab>
 
       <.tab name="DMs" icon_system_name="message">
-        <.direct_message_list>
+        <Text :if={!@current_user} style="font(.subheadline);">
+          Sign in to use the direct messaging feature.
+        </Text>
+        <.direct_message_list :if={@current_user}>
           <.direct_message_item_row
             :for={message <- @chat.latest_message_in_direct_messages}
             current_user={@current_user}
@@ -96,6 +99,19 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       phx-validate="swiftui_validate"
       phx-submit="swiftui_submit"
     />
+
+    <Text
+      :if={!@current_user}
+      style={[
+        "font(.subheadline);",
+        "padding(.horizontal); padding(.vertical, 12);",
+        "overlay(content: :border);",
+        "padding(.horizontal); padding(.bottom);",
+      ]}
+    >
+      <RoundedRectangle template={:border} cornerRadius={4} style="stroke(.gray);" />
+      You are viewing this channel anonymously. Sign in to send messages.
+    </Text>
     """
   end
 end
