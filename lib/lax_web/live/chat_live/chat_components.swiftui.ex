@@ -237,15 +237,14 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   def chat_form(assigns) do
     ~LVN"""
     <Group style="background(.bar);">
-      <HStack style="padding(.vertical);">
+      <HStack style="padding();">
         <.form {@rest} for={@form}>
           <.input
             field={@form[:text]}
             placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
-            style="padding();"
           />
           <LiveSubmitButton
-            style="buttonStyle(.borderedProminent); padding(.trailing);"
+            style="buttonStyle(.borderedProminent);"
             after-submit="clear"
           >
             <Image systemName="paperplane" style="padding(4);" />
