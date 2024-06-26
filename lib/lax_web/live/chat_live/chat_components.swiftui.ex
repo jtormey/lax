@@ -9,23 +9,25 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   alias LaxWeb.ChatLive.ChannelChatComponent
 
+  attr :rest, :global, include: ~w(phx-change selection)
   slot :inner_block, required: true
 
   def tab_bar(assigns) do
     ~LVN"""
-    <TabView>
+    <TabView {@rest}>
       <%= render_slot(@inner_block) %>
     </TabView>
     """
   end
 
+  attr :tag, :any, required: true
   attr :name, :string, required: true
   attr :icon_system_name, :string, required: true
   slot :inner_block, required: true
 
   def tab(assigns) do
     ~LVN"""
-    <Group style="tabItem(:tab);">
+    <Group tag={@tag} style="tabItem(:tab);">
       <Image template={:tab} systemName={@icon_system_name} />
       <Text template={:tab}><%= @name %></Text>
       <%= render_slot(@inner_block) %>

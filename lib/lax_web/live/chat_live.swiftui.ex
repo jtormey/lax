@@ -26,8 +26,8 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </:actions>
     </.header>
 
-    <.tab_bar>
-      <.tab name="Home" icon_system_name="house">
+    <.tab_bar phx-change="swiftui_tab_selection" selection={@swiftui_tab}>
+      <.tab tag={:home} name="Home" icon_system_name="house">
         <.workspace_list>
           <.workspace_section title="Channels">
             <.channel_item
@@ -55,7 +55,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         </.workspace_list>
       </.tab>
 
-      <.tab name="DMs" icon_system_name="message">
+      <.tab tag={:direct_messages} name="DMs" icon_system_name="message">
         <Text :if={!@current_user} style="font(.subheadline);">
           Sign in to use the direct messaging feature.
         </Text>

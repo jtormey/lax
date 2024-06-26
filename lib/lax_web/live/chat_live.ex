@@ -120,15 +120,19 @@ defmodule LaxWeb.ChatLive do
      |> LaxWeb.Presence.Live.track_online_users()}
   end
 
-  def handle_params(%{"id" => channel_id}, _uri, socket) do
+  def handle_params(%{"id" => channel_id} = params, _uri, socket) do
     {:noreply,
      socket
      |> update(:chat, &Chat.select_channel(&1, channel_id))
+     |> assign(:swiftui_tab, swiftui_tab_from_params(params))
      |> put_page_title()}
   end
 
-  def handle_params(_params, _uri, socket) do
-    {:noreply, put_page_title(socket)}
+  def handle_params(params, _uri, socket) do
+    {:noreply,
+     socket
+     |> assign(:swiftui_tab, swiftui_tab_from_params(params))
+     |> put_page_title()}
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
@@ -157,6 +161,10 @@ defmodule LaxWeb.ChatLive do
   end
 
   ## SwiftUI
+
+  def handle_event("swiftui_tab_selection", %{"selection" => selection}, socket) do
+    {:noreply, push_patch(socket, to: ~p"/?#{%{swiftui_tab: selection}}", replace: true)}
+  end
 
   def handle_event("swiftui_navigate", %{"to" => to}, socket) do
     {:noreply, push_navigate(socket, to: to)}
@@ -195,4 +203,7 @@ defmodule LaxWeb.ChatLive do
 
   def sidebar_width(nil), do: 250
   def sidebar_width(current_user), do: current_user.ui_settings.channels_sidebar_width
+
+  def swiftui_tab_from_params(%{"swiftui_tab" => "direct_messages"}), do: :direct_messages
+  def swiftui_tab_from_params(_otherwise), do: :home
 end
