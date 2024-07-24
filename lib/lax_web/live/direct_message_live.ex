@@ -66,6 +66,7 @@ defmodule LaxWeb.DirectMessageLive do
       module={__MODULE__.NewDirectMessageComponent}
       current_user={@current_user}
       tracked_users={@tracked_users}
+      initial_user_ids={@initial_user_ids}
     />
     """
   end
@@ -112,7 +113,8 @@ defmodule LaxWeb.DirectMessageLive do
     {:noreply,
      socket
      |> apply_chat_params(params)
-     |> apply_profile_params(params)}
+     |> apply_profile_params(params)
+     |> apply_initial_user_ids_params(params)}
   end
 
   def apply_chat_params(socket, %{"id" => channel_id}) do
@@ -133,6 +135,14 @@ defmodule LaxWeb.DirectMessageLive do
 
   def apply_profile_params(socket, _params) do
     assign(socket, :user_profile, nil)
+  end
+
+  def apply_initial_user_ids_params(socket, %{"to_user" => user_id}) do
+    assign(socket, :initial_user_ids, [user_id])
+  end
+
+  def apply_initial_user_ids_params(socket, _params) do
+    assign(socket, :initial_user_ids, [])
   end
 
   def handle_event("resize", %{"width" => width}, socket) do

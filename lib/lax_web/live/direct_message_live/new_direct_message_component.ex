@@ -64,18 +64,18 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
   end
 
   def mount(socket) do
-    {:ok,
-     socket
-     |> assign(:params, %{})
-     |> assign(:selected_user_ids, MapSet.new())
-     |> handle_form()}
+    {:ok, assign(socket, :params, %{})}
   end
 
   def update(assigns, socket) do
+    initial_user_ids = MapSet.new(assigns[:initial_user_ids] || [])
+
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:users, Users.list_other_users(assigns.current_user))}
+     |> assign(:selected_user_ids, initial_user_ids)
+     |> assign(:users, Users.list_other_users(assigns.current_user))
+     |> handle_form()}
   end
 
   def handle_event("add", %{"id" => user_id}, socket) do

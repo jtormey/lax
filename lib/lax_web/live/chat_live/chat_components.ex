@@ -120,12 +120,17 @@ defmodule LaxWeb.ChatLive.Components do
       <div class="mt-8">
         <.username user={@user} />
       </div>
-      <div class="mt-4">
+      <div class="mt-2">
         <% local_time = DateTime.shift_zone!(DateTime.utc_now(), @user.time_zone) %>
         <% local_time_strftime = Calendar.strftime(local_time, "%-I:%M%P") %>
         <span class="text-xs text-zinc-200">
           Timezone: <%= @user.time_zone %> (<%= local_time_strftime %> local)
         </span>
+      </div>
+      <div class="mt-8">
+        <.button variant={:action} phx-click={JS.navigate(~p"/direct-messages?to_user=#{@user}")}>
+          Direct message
+        </.button>
       </div>
     </div>
     """
