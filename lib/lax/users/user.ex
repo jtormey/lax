@@ -17,6 +17,7 @@ defmodule Lax.Users.User do
     embeds_one :ui_settings, UiSettings, on_replace: :update, primary_key: false do
       field :channels_sidebar_width, :integer, default: 250
       field :direct_messages_sidebar_width, :integer, default: 500
+      field :profile_sidebar_width, :integer, default: 500
     end
 
     many_to_many :channels, Lax.Channels.Channel, join_through: Lax.Channels.ChannelUser
@@ -174,7 +175,11 @@ defmodule Lax.Users.User do
   end
 
   def ui_settings_embed_changeset(ui_settings, attrs) do
-    cast(ui_settings, attrs, [:channels_sidebar_width, :direct_messages_sidebar_width])
+    cast(ui_settings, attrs, [
+      :channels_sidebar_width,
+      :direct_messages_sidebar_width,
+      :profile_sidebar_width
+    ])
   end
 
   @doc """

@@ -10,6 +10,13 @@ defmodule LaxWeb.ChatLive.Components do
   slot :sidebar, required: true
   slot :inner_block, required: true
 
+  slot :right_sidebar do
+    attr :resize_event, :string
+    attr :width, :integer
+    attr :min_width, :integer
+    attr :max_width, :integer
+  end
+
   def container(assigns) do
     ~H"""
     <div class="flex h-full">
@@ -19,12 +26,24 @@ defmodule LaxWeb.ChatLive.Components do
         data-min-width={@sidebar_min_width}
         data-max-width={@sidebar_max_width}
         style={"width:#{@sidebar_width}px;"}
-        class="resize-container-right border-r border-zinc-700 flex flex-col"
+        class="resize-container resize-container-right border-r border-zinc-700 flex flex-col"
       >
         <%= render_slot(@sidebar) %>
       </div>
       <div class="bg-zinc-900 flex-1 flex flex-col">
         <%= render_slot(@inner_block) %>
+      </div>
+      <div
+        :for={sidebar <- @right_sidebar}
+        id="right_sidebar_resizeable"
+        phx-hook="ResizeContainer"
+        phx-resize={sidebar.resize_event}
+        data-min-width={sidebar.min_width}
+        data-max-width={sidebar.max_width}
+        style={"width:#{sidebar.width}px;"}
+        class="resize-container resize-container-left border-l border-zinc-700 flex flex-col"
+      >
+        <%= render_slot(sidebar) %>
       </div>
     </div>
     """
@@ -205,6 +224,7 @@ defmodule LaxWeb.ChatLive.Components do
   end
 
   attr :user, Lax.Users.User, required: true
+  attr :user_detail_patch, :string
   attr :online, :boolean, required: true
   attr :time, :string, required: true
   attr :text, :string, required: true
@@ -235,7 +255,9 @@ defmodule LaxWeb.ChatLive.Components do
       <.user_profile user={@user} size={:md} class="mt-1" online={@online} />
       <div class="flex-1">
         <div class="space-x-1 leading-none">
-          <.username user={@user} />
+          <.link patch={@user_detail_patch}>
+            <.username user={@user} />
+          </.link>
           <span class="text-xs text-zinc-400">
             <%= @time %>
           </span>

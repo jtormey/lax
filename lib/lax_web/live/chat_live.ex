@@ -64,6 +64,7 @@ defmodule LaxWeb.ChatLive do
         <.message
           :for={message <- group_messages(@chat.messages)}
           user={message.sent_by_user}
+          user_detail_patch={~p"/chat/#{@chat.current_channel}?user=#{message.sent_by_user}"}
           online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
           time={Message.show_time(message, @current_user && @current_user.time_zone)}
           text={message.text}
@@ -85,6 +86,14 @@ defmodule LaxWeb.ChatLive do
       <.notice :if={!@current_user} class="mx-4 mb-4 -mt-2">
         You are viewing this channel anonymously. Sign in to send messages.
       </.notice>
+
+      <:right_sidebar
+        resize_event="resize_profile"
+        width={profile_sidebar_width(@current_user)}
+        min_width={300}
+        max_width={700}
+      >
+      </:right_sidebar>
     </.container>
 
     <.modal :if={@modal == :new_channel} id="new_channel_modal" show on_cancel={JS.push("hide_modal")}>
@@ -138,6 +147,15 @@ defmodule LaxWeb.ChatLive do
   def handle_event("resize", %{"width" => width}, socket) do
     if user = socket.assigns.current_user do
       {:ok, user} = Users.update_user_ui_settings(user, %{channels_sidebar_width: width})
+      {:noreply, assign(socket, :current_user, user)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("resize_profile", %{"width" => width}, socket) do
+    if user = socket.assigns.current_user do
+      {:ok, user} = Users.update_user_ui_settings(user, %{profile_sidebar_width: width})
       {:noreply, assign(socket, :current_user, user)}
     else
       {:noreply, socket}
@@ -203,6 +221,9 @@ defmodule LaxWeb.ChatLive do
 
   def sidebar_width(nil), do: 250
   def sidebar_width(current_user), do: current_user.ui_settings.channels_sidebar_width
+
+  def profile_sidebar_width(nil), do: 500
+  def profile_sidebar_width(current_user), do: current_user.ui_settings.profile_sidebar_width
 
   def swiftui_tab_from_params(%{"swiftui_tab" => "direct_messages"}), do: :direct_messages
   def swiftui_tab_from_params(_otherwise), do: :home
