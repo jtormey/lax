@@ -60,11 +60,18 @@ defmodule LaxWeb.UserRegistrationLive do
       |> assign(:domain, :user)
       |> assign(trigger_submit: false, check_errors: false)
       |> assign_form(changeset)
+      # SwiftUI
+      |> assign(:user_params, %{})
 
     {:ok, socket, temporary_assigns: [form: nil]}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
+    # SwiftUI
+    socket = update(socket, :user_params, &Map.merge(&1, user_params))
+    user_params = socket.assigns.user_params
+    # /SwiftUI
+
     case Users.register_user(user_params) do
       {:ok, user} ->
         {:ok, _} =
@@ -82,6 +89,11 @@ defmodule LaxWeb.UserRegistrationLive do
   end
 
   def handle_event("validate", %{"user" => user_params}, socket) do
+    # SwiftUI
+    socket = update(socket, :user_params, &Map.merge(&1, user_params))
+    user_params = socket.assigns.user_params
+    # /SwiftUI
+
     changeset = Users.change_user_registration(%User{}, user_params)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end

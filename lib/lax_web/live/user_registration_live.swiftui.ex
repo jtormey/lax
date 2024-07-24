@@ -26,7 +26,9 @@ defmodule LaxWeb.UserRegistrationLive.SwiftUI do
       </.error>
 
       <.input field={@form[:email]} type="TextField" label="Email" class="keyboardType(.emailAddress)" autocomplete="off" />
+      <.input field={@form[:username]} type="TextField" label="Username" autocomplete="off" />
       <.input field={@form[:password]} type="SecureField" label="Password" />
+      <.input field={@form[:time_zone]} type="Picker" label="Time Zone" options={time_zone_options()} />
 
       <:actions>
         <.button type="submit">
@@ -35,5 +37,9 @@ defmodule LaxWeb.UserRegistrationLive.SwiftUI do
       </:actions>
     </.simple_form>
     """
+  end
+
+  def time_zone_options() do
+    Enum.map(Tzdata.zone_list(), &{&1, &1})
   end
 end

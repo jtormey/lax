@@ -10,7 +10,7 @@ defmodule Lax.Users.User do
     field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
-    field :time_zone, :string
+    field :time_zone, :string, default: "America/New_York"
     field :display_color, :string
     field :confirmed_at, :naive_datetime
 
