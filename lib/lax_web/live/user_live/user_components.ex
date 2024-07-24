@@ -12,7 +12,7 @@ defmodule LaxWeb.UserLive.Components do
   end
 
   attr :user, Lax.Users.User, required: true
-  attr :size, :atom, values: [:xs, :md]
+  attr :size, :atom, values: [:xs, :md, :xl]
   attr :class, :string, default: nil
   attr :online, :boolean, default: nil
 
@@ -21,6 +21,7 @@ defmodule LaxWeb.UserLive.Components do
       case assigns.size do
         :xs -> {"size-4 rounded", "size-1.5"}
         :md -> {"size-8 rounded-lg", "size-2"}
+        :xl -> {"size-48 rounded-3xl", "size-4"}
       end
 
     assigns = assign(assigns, size_class: size_class, indicator_class: indicator_class)

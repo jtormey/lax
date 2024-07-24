@@ -105,6 +105,32 @@ defmodule LaxWeb.ChatLive.Components do
     """
   end
 
+  attr :user, Lax.Users.User, required: true
+  attr :online_fun, :any, required: true
+  attr :on_cancel, JS, required: true
+
+  def user_profile_sidebar(assigns) do
+    ~H"""
+    <button phx-click={@on_cancel} class="absolute top-2 right-3">
+      <.icon name="hero-x-mark" class="size-4 text-white" />
+    </button>
+
+    <div class="pt-32 flex flex-col items-center">
+      <.user_profile user={@user} online={@online_fun.(@user)} size={:xl} />
+      <div class="mt-8">
+        <.username user={@user} />
+      </div>
+      <div class="mt-4">
+        <% local_time = DateTime.shift_zone!(DateTime.utc_now(), @user.time_zone) %>
+        <% local_time_strftime = Calendar.strftime(local_time, "%-I:%M%P") %>
+        <span class="text-xs text-zinc-200">
+          Timezone: <%= @user.time_zone %> (<%= local_time_strftime %> local)
+        </span>
+      </div>
+    </div>
+    """
+  end
+
   attr :name, :string, required: true
   attr :selected, :boolean, default: false
   attr :active, :boolean, default: false

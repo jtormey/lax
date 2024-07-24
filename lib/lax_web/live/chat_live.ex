@@ -64,7 +64,7 @@ defmodule LaxWeb.ChatLive do
         <.message
           :for={message <- group_messages(@chat.messages)}
           user={message.sent_by_user}
-          user_detail_patch={~p"/chat/#{@chat.current_channel}?user=#{message.sent_by_user}"}
+          user_detail_patch={~p"/chat/#{@chat.current_channel}?profile=#{message.sent_by_user}"}
           online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
           time={Message.show_time(message, @current_user && @current_user.time_zone)}
           text={message.text}
@@ -88,11 +88,17 @@ defmodule LaxWeb.ChatLive do
       </.notice>
 
       <:right_sidebar
+        :if={@user_profile}
         resize_event="resize_profile"
         width={profile_sidebar_width(@current_user)}
         min_width={300}
         max_width={700}
       >
+        <.user_profile_sidebar
+          user={@user_profile}
+          online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+          on_cancel={JS.patch(~p"/chat/#{@chat.current_channel}")}
+        />
       </:right_sidebar>
     </.container>
 
@@ -125,23 +131,34 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
+     |> assign(:user_profile, nil)
      |> ChannelChatComponent.handle_form()
      |> LaxWeb.Presence.Live.track_online_users()}
-  end
-
-  def handle_params(%{"id" => channel_id} = params, _uri, socket) do
-    {:noreply,
-     socket
-     |> update(:chat, &Chat.select_channel(&1, channel_id))
-     |> assign(:swiftui_tab, swiftui_tab_from_params(params))
-     |> put_page_title()}
   end
 
   def handle_params(params, _uri, socket) do
     {:noreply,
      socket
      |> assign(:swiftui_tab, swiftui_tab_from_params(params))
+     |> apply_chat_params(params)
+     |> apply_profile_params(params)
      |> put_page_title()}
+  end
+
+  def apply_chat_params(socket, %{"id" => channel_id}) do
+    update(socket, :chat, &Chat.select_channel(&1, channel_id))
+  end
+
+  def apply_chat_params(socket, _params) do
+    socket
+  end
+
+  def apply_profile_params(socket, %{"profile" => user_id}) do
+    assign(socket, :user_profile, Users.get_user!(user_id))
+  end
+
+  def apply_profile_params(socket, _params) do
+    assign(socket, :user_profile, nil)
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
