@@ -41,6 +41,20 @@ defmodule LaxWeb.DirectMessageLive do
       </:sidebar>
 
       <.render_action :if={@current_user} {assigns} />
+
+      <:right_sidebar
+        :if={@user_profile}
+        resize_event="resize_profile"
+        width={profile_sidebar_width(@current_user)}
+        min_width={300}
+        max_width={700}
+      >
+        <.user_profile_sidebar
+          user={@user_profile}
+          online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+          on_cancel={JS.patch(~p"/direct-messages/#{@chat.current_channel}")}
+        />
+      </:right_sidebar>
     </.container>
     """
   end
@@ -64,6 +78,9 @@ defmodule LaxWeb.DirectMessageLive do
       <.message
         :for={message <- group_messages(@chat.messages)}
         user={message.sent_by_user}
+        user_detail_patch={
+          ~p"/direct-messages/#{@chat.current_channel}?profile=#{message.sent_by_user}"
+        }
         online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
         time={Message.show_time(message, @current_user && @current_user.time_zone)}
         text={message.text}
@@ -91,23 +108,45 @@ defmodule LaxWeb.DirectMessageLive do
      |> LaxWeb.Presence.Live.track_online_users()}
   end
 
-  def handle_params(%{"id" => channel_id}, _uri, socket) do
+  def handle_params(params, _uri, socket) do
     {:noreply,
      socket
-     |> update(:chat, &Chat.select_channel(&1, channel_id))
-     |> put_page_title()}
+     |> apply_chat_params(params)
+     |> apply_profile_params(params)}
   end
 
-  def handle_params(_params, _uri, socket) do
-    {:noreply,
-     socket
-     |> update(:chat, &Chat.select_channel(&1, nil))
-     |> assign(:page_title, "New message")}
+  def apply_chat_params(socket, %{"id" => channel_id}) do
+    socket
+    |> update(:chat, &Chat.select_channel(&1, channel_id))
+    |> put_page_title()
+  end
+
+  def apply_chat_params(socket, _params) do
+    socket
+    |> update(:chat, &Chat.select_channel(&1, nil))
+    |> assign(:page_title, "New message")
+  end
+
+  def apply_profile_params(socket, %{"profile" => user_id}) do
+    assign(socket, :user_profile, Users.get_user!(user_id))
+  end
+
+  def apply_profile_params(socket, _params) do
+    assign(socket, :user_profile, nil)
   end
 
   def handle_event("resize", %{"width" => width}, socket) do
     if user = socket.assigns.current_user do
       {:ok, user} = Users.update_user_ui_settings(user, %{direct_messages_sidebar_width: width})
+      {:noreply, assign(socket, :current_user, user)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("resize_profile", %{"width" => width}, socket) do
+    if user = socket.assigns.current_user do
+      {:ok, user} = Users.update_user_ui_settings(user, %{profile_sidebar_width: width})
       {:noreply, assign(socket, :current_user, user)}
     else
       {:noreply, socket}
@@ -141,4 +180,7 @@ defmodule LaxWeb.DirectMessageLive do
 
   def sidebar_width(nil), do: 500
   def sidebar_width(current_user), do: current_user.ui_settings.direct_messages_sidebar_width
+
+  def profile_sidebar_width(nil), do: 500
+  def profile_sidebar_width(current_user), do: current_user.ui_settings.profile_sidebar_width
 end

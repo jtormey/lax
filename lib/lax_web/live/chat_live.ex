@@ -131,7 +131,6 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
-     |> assign(:user_profile, nil)
      |> ChannelChatComponent.handle_form()
      |> LaxWeb.Presence.Live.track_online_users()}
   end
