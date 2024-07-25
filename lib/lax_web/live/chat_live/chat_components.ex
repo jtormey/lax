@@ -113,7 +113,12 @@ defmodule LaxWeb.ChatLive.Components do
 
   def user_profile_sidebar(assigns) do
     ~H"""
-    <button phx-click={@on_cancel} class="absolute top-2 right-3">
+    <button
+      phx-click={@on_cancel}
+      phx-window-keydown={@on_cancel}
+      phx-key="Escape"
+      class="absolute top-2 right-3"
+    >
       <.icon name="hero-x-mark" class="size-4 text-white" />
     </button>
 
