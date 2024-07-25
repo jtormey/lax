@@ -57,7 +57,7 @@ defmodule LaxWeb.DirectMessageLive.Components do
                   <%= Message.show_time(@latest_message, @current_user && @current_user.time_zone) %>
                 </span>
               </div>
-              <span class="text-sm text-zinc-400 line-clamp-2">
+              <span class="text-sm text-zinc-400 line-clamp-2 break-all">
                 <%= @latest_message.sent_by_user.username %>: <%= @latest_message.text %>
               </span>
             </div>

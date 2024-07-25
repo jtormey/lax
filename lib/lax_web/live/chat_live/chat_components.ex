@@ -30,8 +30,10 @@ defmodule LaxWeb.ChatLive.Components do
       >
         <%= render_slot(@sidebar) %>
       </div>
-      <div class="bg-zinc-900 flex-1 flex flex-col">
-        <%= render_slot(@inner_block) %>
+      <div class="flex-1 relative">
+        <div class="absolute inset-0 bg-zinc-900 flex flex-col">
+          <%= render_slot(@inner_block) %>
+        </div>
       </div>
       <div
         :for={sidebar <- @right_sidebar}
@@ -270,8 +272,8 @@ defmodule LaxWeb.ChatLive.Components do
           <%= @time %>
         </span>
       </div>
-      <div class="flex-1">
-        <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
+      <div class="flex-1 overflow-x-hidden">
+        <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @text %></p>
       </div>
       <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
         <.icon_button icon="hero-trash" phx-click={@on_delete} />
@@ -293,8 +295,8 @@ defmodule LaxWeb.ChatLive.Components do
             <%= @time %>
           </span>
         </div>
-        <div class="flex-1">
-          <p class="text-sm text-zinc-300 whitespace-pre-wrap"><%= @text %></p>
+        <div class="flex-1 overflow-x-hidden">
+          <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @text %></p>
         </div>
       </div>
       <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
