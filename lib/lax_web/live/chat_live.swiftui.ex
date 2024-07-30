@@ -106,7 +106,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           :if={@current_user}
           chat={@chat}
           form={@chat_form}
-          phx-validate="swiftui_validate"
+          phx-change="swiftui_validate"
           phx-submit="swiftui_submit"
         />
         <.chat_signed_out_notice :if={!@current_user} />
