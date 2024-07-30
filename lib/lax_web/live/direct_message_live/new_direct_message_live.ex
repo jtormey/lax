@@ -1,5 +1,6 @@
-defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
-  use LaxWeb, :live_component
+defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
+  use LaxWeb, :live_view
+  use LaxNative, :live_view
 
   alias Lax.Channels
   alias Lax.Messages
@@ -10,61 +11,67 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-1 flex-col">
-      <div class="flex justify-between gap-2 border-b border-zinc-700 p-4">
-        <.header>
-          New message
-        </.header>
-      </div>
+    <div class="flex justify-between gap-2 border-b border-zinc-700 p-4">
+      <.header>
+        New message
+      </.header>
+    </div>
 
-      <div class="flex-1 relative overflow-y-scroll no-scrollbar px-4">
-        <div class="absolute inset-0">
-          <div class="flex-1 mx-auto max-w-sm py-16">
-            <div
-              :for={user <- @users}
-              class="w-full flex gap-4 items-center border-b border-zinc-700 py-6"
+    <div class="flex-1 relative overflow-y-scroll no-scrollbar px-4">
+      <div class="absolute inset-0">
+        <div class="flex-1 mx-auto max-w-sm py-16">
+          <div
+            :for={user <- @users}
+            class="w-full flex gap-4 items-center border-b border-zinc-700 py-6"
+          >
+            <.user_profile
+              user={user}
+              online={LaxWeb.Presence.Live.online?(assigns, user)}
+              size={:md}
+            />
+            <.username user={user} />
+            <div class="flex-1" />
+            <.button
+              :if={user.id not in @selected_user_ids}
+              variant={:action}
+              icon="hero-plus-circle-mini"
+              phx-click={JS.push("add", value: %{id: user.id})}
             >
-              <.user_profile
-                user={user}
-                online={LaxWeb.Presence.Live.online?(assigns, user)}
-                size={:md}
-              />
-              <.username user={user} />
-              <div class="flex-1" />
-              <.button
-                :if={user.id not in @selected_user_ids}
-                variant={:action}
-                icon="hero-plus-circle-mini"
-                phx-click={JS.push("add", value: %{id: user.id}, target: @myself)}
-              >
-                Add
-              </.button>
-              <.button
-                :if={user.id in @selected_user_ids}
-                class="group"
-                phx-click={JS.push("remove", value: %{id: user.id}, target: @myself)}
-              >
-                <span class="hidden group-hover:inline-block">Remove</span>
-                <span class="inline-block group-hover:hidden">Added</span>
-              </.button>
-            </div>
+              Add
+            </.button>
+            <.button
+              :if={user.id in @selected_user_ids}
+              class="group"
+              phx-click={JS.push("remove", value: %{id: user.id})}
+            >
+              <span class="hidden group-hover:inline-block">Remove</span>
+              <span class="inline-block group-hover:hidden">Added</span>
+            </.button>
           </div>
         </div>
       </div>
-
-      <.chat_form
-        form={@chat_form}
-        placeholder="Start a new message"
-        phx-change="validate"
-        phx-submit="submit"
-        phx-target={@myself}
-      />
     </div>
+
+    <.chat_form
+      form={@chat_form}
+      placeholder="Start a new message"
+      phx-change="validate"
+      phx-submit="submit"
+    />
     """
   end
 
-  def mount(socket) do
-    {:ok, assign(socket, :params, %{})}
+  def mount(_params, session, socket) do
+    current_user = if user_token = session["user_token"] do
+      Users.get_user_by_session_token(user_token)
+    end
+    {:ok,
+      socket
+      |> assign(:params, %{})
+      |> assign(:selected_user_ids, MapSet.new(session["initial_user_ids"] || []))
+      |> assign(:current_user, current_user)
+      |> assign(:users, Users.list_other_users(current_user))
+      |> handle_form()}
   end
 
   def update(assigns, socket) do

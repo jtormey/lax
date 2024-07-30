@@ -9,10 +9,13 @@ defmodule LaxWeb.DirectMessageLive.Components.SwiftUI do
 
   def direct_message_list(assigns) do
     ~LVN"""
-    <ScrollView>
+    <ScrollView style="toolbarTitleMenu(content: :toolbar);">
       <VStack alignment="leading">
         <%= render_slot(@inner_block) %>
       </VStack>
+      <Button template="toolbar">
+        <Image systemName="plus" />
+      </Button>
     </ScrollView>
     """
   end
