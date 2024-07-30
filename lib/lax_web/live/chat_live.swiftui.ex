@@ -9,6 +9,16 @@ defmodule LaxWeb.ChatLive.SwiftUI do
   import LaxWeb.DirectMessageLive.Components.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
+  def render(%{ user_profile: user_profile } = assigns, _interface) when not is_nil(user_profile) do
+    ~LVN"""
+    <.user_profile_sidebar
+      user={@user_profile}
+      online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+      current_user={@current_user}
+    />
+    """
+  end
+
   def render(%{live_action: :chat} = assigns, _interface) do
     ~LVN"""
     <.header>
@@ -84,6 +94,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         :for={message <- Enum.reverse(group_messages(@chat.messages))}
         message_id={message.id}
         user={message.sent_by_user}
+        user_detail_patch={~p"/chat/#{@chat.current_channel}?profile=#{message.sent_by_user}"}
         online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
         time={Message.show_time(message, @current_user && @current_user.time_zone)}
         text={message.text}

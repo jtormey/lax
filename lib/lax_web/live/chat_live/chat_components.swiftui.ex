@@ -1,5 +1,5 @@
 defmodule LaxWeb.ChatLive.Components.SwiftUI do
-  use LiveViewNative.Component
+  use LaxNative, [:component, format: :swiftui]
 
   import LiveViewNative.LiveForm.Component
   import LiveViewNative.SwiftUI.Component
@@ -46,16 +46,16 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   def user_options(assigns) do
     ~LVN"""
-    <Group {@rest} style='contextMenu(menuItems: :user_menu);'>
-      <HStack template={:user_menu}>
+    <Menu {@rest}>
+      <Group template="label">
+        <%= render_slot(@inner_block) %>
+      </Group>
       <.link :for={option <- @option} navigate={option[:navigate]}>
         <Label systemImage={option[:system_image]}>
           <%= render_slot(option) %>
         </Label>
       </.link>
-      </HStack>
-      <%= render_slot(@inner_block) %>
-    </Group>
+    </Menu>
     """
   end
 
@@ -169,6 +169,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   attr :message_id, :string, required: true
   attr :user, Lax.Users.User, required: true
+  attr :user_detail_patch, :string
   attr :online, :boolean, required: true
   attr :time, :string, required: true
   attr :text, :string, required: true
@@ -220,9 +221,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         </VStack>
         <VStack alignment="leading">
           <HStack>
-            <Text style="font(.headline);">
-              <%= @user.username %>
-            </Text>
+            <.link navigate={@user_detail_patch}>
+              <Text style="font(.headline);">
+                <%= @user.username %>
+              </Text>
+            </.link>
             <Spacer />
             <Text style="font(.caption2); padding(.top, 4);">
               <%= @time %>
@@ -272,6 +275,51 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       <RoundedRectangle template={:border} cornerRadius={4} style="stroke(.gray);" />
       You are viewing this channel anonymously. Sign in to send messages.
     </Text>
+    """
+  end
+
+  attr :user, Lax.Users.User, required: true
+  attr :online_fun, :any, required: true
+  attr :on_cancel, :string, required: true
+  attr :current_user, Lax.Users.User
+
+  def user_profile_sidebar(assigns) do
+    ~LVN"""
+    <ScrollView
+      style={[
+        ~s[tint(attr("display_color"))],
+        ~s[navigationTitle("Profile")]
+      ]}
+      display_color={@user.display_color}
+    >
+      <VStack
+        alignment="leading"
+        style="padding();"
+      >
+        <.user_profile user={@user} online={@online_fun.(@user)} size={:xl} />
+        <Text style="font(.title2); bold();"><%= @user.username %></Text>
+
+        <LabeledContent>
+          <Text template="label">Status</Text>
+          <Text><%= if @online_fun.(@user), do: "Online", else: "Away" %></Text>
+        </LabeledContent>
+
+        <LabeledContent>
+          <% local_time = DateTime.shift_zone!(DateTime.utc_now(), @user.time_zone) %>
+          <% local_time_strftime = Calendar.strftime(local_time, "%-I:%M%P") %>
+          <Text template="label">Timezone</Text>
+          <Text><%= @user.time_zone %> (<%= local_time_strftime %> local)</Text>
+        </LabeledContent>
+
+        <.link
+          :if={@current_user}
+          navigate={~p"/direct-messages?to_user=#{@user}"}
+          style='buttonStyle(.borderedProminent); controlSize(.large); padding(.vertical);'
+        >
+          <Text style="frame(maxWidth: .infinity);">Direct message</Text>
+        </.link>
+      </VStack>
+    </ScrollView>
     """
   end
 end
