@@ -7,8 +7,6 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   import LaxWeb.CoreComponents.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
-  alias LaxWeb.ChatLive.ChannelChatComponent
-
   attr :rest, :global, include: ~w(phx-change selection)
   slot :inner_block, required: true
 
@@ -284,7 +282,6 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   attr :user, Lax.Users.User, required: true
   attr :online_fun, :any, required: true
-  attr :on_cancel, :string, required: true
   attr :current_user, Lax.Users.User
 
   def user_profile_sidebar(assigns) do
