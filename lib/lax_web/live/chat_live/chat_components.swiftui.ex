@@ -222,7 +222,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         <VStack alignment="leading">
           <HStack>
             <.link navigate={@user_detail_patch}>
-              <Text style="font(.headline);">
+              <Text style="font(.headline); foregroundStyle(.primary);">
                 <%= @user.username %>
               </Text>
             </.link>
