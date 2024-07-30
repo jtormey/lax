@@ -64,7 +64,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
     mount(%{}, Map.put(session, "initial_user_ids", [to_user]), socket)
   end
 
-  def mount(_params, session, socket) do
+  def mount(params, session, socket) when params == :not_mounted_at_router or socket.assigns._format == "swiftui" do
     current_user = if user_token = session["user_token"] do
       Users.get_user_by_session_token(user_token)
     end
@@ -78,6 +78,10 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
       |> assign(:filter, "")
       |> assign(:filtered_users, all_users)
       |> handle_form()}
+  end
+
+  def mount(_params, _session, socket) do
+    {:ok, redirect(socket, to: ~p"/direct-messages")}
   end
 
   def handle_event("add", %{"id" => user_id}, socket) do
