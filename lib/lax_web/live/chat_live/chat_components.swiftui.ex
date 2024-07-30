@@ -152,7 +152,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   def chat(assigns) do
     ~LVN"""
-    <ScrollView style="defaultScrollAnchor(.bottom); safeAreaInset(edge: .bottom, content: :bottom_bar);">
+    <ScrollView style="scrollDismissesKeyboard(.immediately); defaultScrollAnchor(.bottom); safeAreaInset(edge: .bottom, content: :bottom_bar);">
       <VStack
         alignment="leading"
         style='frame(maxWidth: .infinity, alignment: .leading); animation(.default, value: attr("animation_key"));'
@@ -160,9 +160,10 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       >
         <%= render_slot(@inner_block) %>
       </VStack>
-      <Group template={:bottom_bar} style="background(.bar);">
+      <VStack spacing="0" template={:bottom_bar} style="background(.bar);">
+        <Divider />
         <%= render_slot(@bottom_bar) %>
-      </Group>
+      </VStack>
     </ScrollView>
     """
   end
@@ -242,17 +243,23 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   def chat_form(assigns) do
     ~LVN"""
-    <HStack style="padding();">
+    <HStack style="padding(.leading); padding(.vertical, 8); padding(.trailing, 8);">
       <.form {@rest} for={@form}>
         <.input
-          field={@form[:text]}
+          field={Map.put(@form[:text], :errors, [])}
           placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
         />
         <LiveSubmitButton
-          style="buttonStyle(.borderedProminent);"
+          style={[
+            "buttonStyle(.borderedProminent)",
+            "buttonBorderShape(.circle)",
+            "controlSize(.small)",
+            ~s[disabled(attr("disabled"))]
+          ]}
           after-submit="clear"
+          disabled={not @form.source.valid?}
         >
-          <Image systemName="paperplane" style="padding(4);" />
+          <Image systemName="paperplane.fill" style="padding(4);" />
         </LiveSubmitButton>
       </.form>
     </HStack>
