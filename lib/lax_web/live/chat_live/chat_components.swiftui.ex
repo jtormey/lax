@@ -240,9 +240,9 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     """
   end
 
-  attr :chat, Lax.Chat, required: true
   attr :form, Phoenix.HTML.Form, required: true
-  attr :rest, :global
+  attr :placeholder, :string, required: true
+  attr :rest, :global, include: ~w(phx-change phx-submit phx-target)
 
   def chat_form(assigns) do
     ~LVN"""
@@ -250,7 +250,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       <.form {@rest} for={@form}>
         <.input
           field={Map.put(@form[:text], :errors, [])}
-          placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
+          placeholder={@placeholder}
         />
         <LiveSubmitButton
           style={[

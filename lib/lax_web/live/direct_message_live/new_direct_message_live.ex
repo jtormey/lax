@@ -65,12 +65,15 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
     current_user = if user_token = session["user_token"] do
       Users.get_user_by_session_token(user_token)
     end
+    all_users = Users.list_other_users(current_user)
     {:ok,
       socket
       |> assign(:params, %{})
       |> assign(:selected_user_ids, MapSet.new(session["initial_user_ids"] || []))
       |> assign(:current_user, current_user)
-      |> assign(:users, Users.list_other_users(current_user))
+      |> assign(:users, all_users)
+      |> assign(:filter, "")
+      |> assign(:filtered_users, all_users)
       |> handle_form()}
   end
 
@@ -99,6 +102,10 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
      |> handle_form()}
   end
 
+  def handle_event("filter", %{ "filter" => filter }, socket) do
+    {:noreply, assign(socket, filter: filter, filtered_users: filter_users(socket.assigns.users, filter))}
+  end
+
   def handle_event("validate", %{"chat" => params}, socket) do
     {:noreply,
      socket
@@ -124,6 +131,9 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
         Messages.broadcast_sent_message(channel, message)
 
         send(self(), {__MODULE__, {:create_direct_message, channel}})
+
+        socket = push_navigate(socket, to: ~p"/chat/#{channel.id}", replace: true)
+
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -154,5 +164,9 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
     |> put_change(:user_ids, MapSet.to_list(socket.assigns.selected_user_ids))
     |> validate_required([:text])
     |> validate_length(:user_ids, min: 1)
+  end
+
+  def filter_users(users, filter) do
+    Enum.filter(users, &(&1.username |> String.downcase() |> String.contains?(String.downcase(filter))))
   end
 end

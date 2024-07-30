@@ -36,7 +36,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </:actions>
       <:actions placement="navigation">
         <Group>
-          <.link :if={@current_user != nil and @swiftui_tab == :direct_messages} navigate={~p"/direct-messages"}>
+          <.link :if={@current_user != nil and @swiftui_tab == :direct_messages} navigate={~p"/new-direct-message"}>
             <Image systemName="plus" />
           </.link>
         </Group>
@@ -111,7 +111,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       <:bottom_bar>
         <.chat_form
           :if={@current_user}
-          chat={@chat}
+          placeholder={LaxWeb.ChatLive.ChannelChatComponent.placeholder(@chat.current_channel)}
           form={@chat_form}
           phx-change="swiftui_validate"
           phx-submit="swiftui_submit"

@@ -283,6 +283,7 @@ defmodule LaxWeb.CoreComponents.SwiftUI do
       >
         <%= render_slot(action) %>
       </ToolbarItemGroup>
+      <ToolbarItemGroup template="toolbar" :if={Enum.empty?(@actions)} />
     </VStack>
     """
   end
