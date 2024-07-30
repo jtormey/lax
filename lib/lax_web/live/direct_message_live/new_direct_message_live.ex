@@ -16,7 +16,6 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
         New message
       </.header>
     </div>
-
     <div class="flex-1 relative overflow-y-scroll no-scrollbar px-4">
       <div class="absolute inset-0">
         <div class="flex-1 mx-auto max-w-sm py-16">
@@ -61,6 +60,10 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
     """
   end
 
+  def mount(%{ "to_user" => to_user }, session, socket) do
+    mount(%{}, Map.put(session, "initial_user_ids", [to_user]), socket)
+  end
+
   def mount(_params, session, socket) do
     current_user = if user_token = session["user_token"] do
       Users.get_user_by_session_token(user_token)
@@ -75,17 +78,6 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
       |> assign(:filter, "")
       |> assign(:filtered_users, all_users)
       |> handle_form()}
-  end
-
-  def update(assigns, socket) do
-    initial_user_ids = MapSet.new(assigns[:initial_user_ids] || [])
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:selected_user_ids, initial_user_ids)
-     |> assign(:users, Users.list_other_users(assigns.current_user))
-     |> handle_form()}
   end
 
   def handle_event("add", %{"id" => user_id}, socket) do

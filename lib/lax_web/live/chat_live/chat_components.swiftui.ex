@@ -112,7 +112,6 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   def direct_message_item(assigns) do
     ~LVN"""
     <.link {@rest}>
-      <% dbg @unread_count %>
       <LabeledContent style='badge(attr("count"));' count={@unread_count}>
         <HStack template="label">
           <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
@@ -318,7 +317,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
         <.link
           :if={@current_user}
-          navigate={~p"/direct-messages?to_user=#{@user}"}
+          navigate={~p"/new-direct-message?to_user=#{@user}"}
           style='buttonStyle(.borderedProminent); controlSize(.large); padding(.vertical);'
         >
           <Text style="frame(maxWidth: .infinity);">Direct message</Text>
