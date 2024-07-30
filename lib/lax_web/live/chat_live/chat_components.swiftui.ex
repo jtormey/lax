@@ -228,11 +228,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
               </Text>
             </.link>
             <Spacer />
-            <Text style="font(.caption2); padding(.top, 4);">
+            <Text style="font(.caption2); foregroundStyle(.secondary); padding(.top, 4);">
               <%= @time %>
             </Text>
           </HStack>
-          <Text style="font(.body);" markdown={@text} />
+          <Text style="font(.body); textSelection(.enabled);" markdown={@text} />
         </VStack>
         <Spacer />
       </HStack>
