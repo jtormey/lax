@@ -112,16 +112,14 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   def direct_message_item(assigns) do
     ~LVN"""
     <.link {@rest}>
-      <LabeledContent style="badge(:badge)">
+      <% dbg @unread_count %>
+      <LabeledContent style='badge(attr("count"));' count={@unread_count}>
         <HStack template="label">
           <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
           <Text>
             <%= Enum.map_join(@users, ", ", & &1.username) %>
           </Text>
         </HStack>
-        <Text :if={@active} template={:badge}>
-          <%= @unread_count %>
-        </Text>
       </LabeledContent>
     </.link>
     """
