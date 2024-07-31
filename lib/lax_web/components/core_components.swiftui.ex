@@ -260,7 +260,9 @@ defmodule LaxWeb.CoreComponents.SwiftUI do
 
   slot :inner_block, required: true
   slot :subtitle
-  slot :actions
+  slot :actions do
+    attr :placement, :string
+  end
 
   def header(assigns) do
     ~LVN"""
@@ -274,9 +276,14 @@ defmodule LaxWeb.CoreComponents.SwiftUI do
       <Text :if={@subtitle != []} template="subtitle">
         <%= render_slot(@subtitle) %>
       </Text>
-      <ToolbarItemGroup template="toolbar">
-        <%= render_slot(@actions) %>
+      <ToolbarItemGroup
+        :for={action <- @actions}
+        template="toolbar"
+        placement={action.placement}
+      >
+        <%= render_slot(action) %>
       </ToolbarItemGroup>
+      <ToolbarItemGroup template="toolbar" :if={Enum.empty?(@actions)} />
     </VStack>
     """
   end

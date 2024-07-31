@@ -23,7 +23,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
     ~LVN"""
     <.header>
       Workspace
-      <:actions>
+      <:actions placement="primaryAction">
         <.link :if={!@current_user} navigate={~p"/users/register"} class="font-weight-semibold fg-tint">
           Sign in or register
         </.link>
@@ -33,6 +33,13 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           </:option>
           <.user_profile :if={@current_user} user={@current_user} size={:md} online />
         </.user_options>
+      </:actions>
+      <:actions placement="navigation">
+        <Group>
+          <.link :if={@current_user != nil and @swiftui_tab == :direct_messages} navigate={~p"/new-direct-message"}>
+            <Image systemName="plus" />
+          </.link>
+        </Group>
       </:actions>
     </.header>
 
@@ -65,7 +72,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         </.workspace_list>
       </.tab>
 
-      <.tab tag={:direct_messages} name="DMs" icon_system_name="message">
+      <.tab tag={:direct_messages} name="DMs" icon_system_name="bubble.left.and.text.bubble.right">
         <Text :if={!@current_user} style="font(.subheadline);">
           Sign in to use the direct messaging feature.
         </Text>
@@ -104,7 +111,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       <:bottom_bar>
         <.chat_form
           :if={@current_user}
-          chat={@chat}
+          placeholder={LaxWeb.ChatLive.ChannelChatComponent.placeholder(@chat.current_channel)}
           form={@chat_form}
           phx-change="swiftui_validate"
           phx-submit="swiftui_submit"

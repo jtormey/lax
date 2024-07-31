@@ -7,8 +7,6 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   import LaxWeb.CoreComponents.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
-  alias LaxWeb.ChatLive.ChannelChatComponent
-
   attr :rest, :global, include: ~w(phx-change selection)
   slot :inner_block, required: true
 
@@ -112,16 +110,13 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   def direct_message_item(assigns) do
     ~LVN"""
     <.link {@rest}>
-      <LabeledContent style="badge(:badge)">
+      <LabeledContent style='badge(attr("count"));' count={@unread_count}>
         <HStack template="label">
           <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
           <Text>
             <%= Enum.map_join(@users, ", ", & &1.username) %>
           </Text>
         </HStack>
-        <Text :if={@active} template={:badge}>
-          <%= @unread_count %>
-        </Text>
       </LabeledContent>
     </.link>
     """
@@ -228,11 +223,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
               </Text>
             </.link>
             <Spacer />
-            <Text style="font(.caption2); padding(.top, 4);">
+            <Text style="font(.caption2); foregroundStyle(.secondary); padding(.top, 4);">
               <%= @time %>
             </Text>
           </HStack>
-          <Text style="font(.body);" markdown={@text} />
+          <Text style="font(.body); textSelection(.enabled);" markdown={@text} />
         </VStack>
         <Spacer />
       </HStack>
@@ -240,9 +235,9 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     """
   end
 
-  attr :chat, Lax.Chat, required: true
   attr :form, Phoenix.HTML.Form, required: true
-  attr :rest, :global
+  attr :placeholder, :string, required: true
+  attr :rest, :global, include: ~w(phx-change phx-submit phx-target)
 
   def chat_form(assigns) do
     ~LVN"""
@@ -250,7 +245,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       <.form {@rest} for={@form}>
         <.input
           field={Map.put(@form[:text], :errors, [])}
-          placeholder={ChannelChatComponent.placeholder(@chat.current_channel)}
+          placeholder={@placeholder}
         />
         <LiveSubmitButton
           style={[
@@ -287,7 +282,6 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   attr :user, Lax.Users.User, required: true
   attr :online_fun, :any, required: true
-  attr :on_cancel, :string, required: true
   attr :current_user, Lax.Users.User
 
   def user_profile_sidebar(assigns) do
@@ -320,7 +314,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
         <.link
           :if={@current_user}
-          navigate={~p"/direct-messages?to_user=#{@user}"}
+          navigate={~p"/new-direct-message?to_user=#{@user}"}
           style='buttonStyle(.borderedProminent); controlSize(.large); padding(.vertical);'
         >
           <Text style="frame(maxWidth: .infinity);">Direct message</Text>

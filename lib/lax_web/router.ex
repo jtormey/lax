@@ -68,6 +68,7 @@ defmodule LaxWeb.Router do
       live "/chat/:id", ChatLive, :chat_selected
       live "/direct-messages", DirectMessageLive, :new
       live "/direct-messages/:id", DirectMessageLive, :show
+      live "/new-direct-message", DirectMessageLive.NewDirectMessageLive, :new
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
