@@ -9,16 +9,6 @@ defmodule LaxWeb.ChatLive.SwiftUI do
   import LaxWeb.DirectMessageLive.Components.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
-  # def render(%{user_profile: user_profile} = assigns, _interface) when not is_nil(user_profile) do
-  #   ~LVN"""
-  #   <.user_profile_sidebar
-  #     user={@user_profile}
-  #     online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
-  #     current_user={@current_user}
-  #   />
-  #   """
-  # end
-
   def render(%{live_action: :chat} = assigns, _interface) do
     ~LVN"""
     <.header>
