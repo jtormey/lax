@@ -60,24 +60,28 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
     """
   end
 
-  def mount(%{ "to_user" => to_user }, session, socket) do
+  def mount(%{"to_user" => to_user}, session, socket) do
     mount(%{}, Map.put(session, "initial_user_ids", [to_user]), socket)
   end
 
-  def mount(params, session, socket) when params == :not_mounted_at_router or socket.assigns._format == "swiftui" do
-    current_user = if user_token = session["user_token"] do
-      Users.get_user_by_session_token(user_token)
-    end
+  def mount(params, session, socket)
+      when params == :not_mounted_at_router or socket.assigns._format == "swiftui" do
+    current_user =
+      if user_token = session["user_token"] do
+        Users.get_user_by_session_token(user_token)
+      end
+
     all_users = Users.list_other_users(current_user)
+
     {:ok,
-      socket
-      |> assign(:params, %{})
-      |> assign(:selected_user_ids, MapSet.new(session["initial_user_ids"] || []))
-      |> assign(:current_user, current_user)
-      |> assign(:users, all_users)
-      |> assign(:filter, "")
-      |> assign(:filtered_users, all_users)
-      |> handle_form()}
+     socket
+     |> assign(:params, %{})
+     |> assign(:selected_user_ids, MapSet.new(session["initial_user_ids"] || []))
+     |> assign(:current_user, current_user)
+     |> assign(:users, all_users)
+     |> assign(:filter, "")
+     |> assign(:filtered_users, all_users)
+     |> handle_form()}
   end
 
   def mount(_params, _session, socket) do
@@ -98,8 +102,9 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
      |> handle_form()}
   end
 
-  def handle_event("filter", %{ "filter" => filter }, socket) do
-    {:noreply, assign(socket, filter: filter, filtered_users: filter_users(socket.assigns.users, filter))}
+  def handle_event("filter", %{"filter" => filter}, socket) do
+    {:noreply,
+     assign(socket, filter: filter, filtered_users: filter_users(socket.assigns.users, filter))}
   end
 
   def handle_event("validate", %{"chat" => params}, socket) do
@@ -163,6 +168,9 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
   end
 
   def filter_users(users, filter) do
-    Enum.filter(users, &(&1.username |> String.downcase() |> String.contains?(String.downcase(filter))))
+    Enum.filter(
+      users,
+      &(&1.username |> String.downcase() |> String.contains?(String.downcase(filter)))
+    )
   end
 end

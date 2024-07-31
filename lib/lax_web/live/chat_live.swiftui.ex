@@ -9,7 +9,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
   import LaxWeb.DirectMessageLive.Components.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
-  def render(%{ user_profile: user_profile } = assigns, _interface) when not is_nil(user_profile) do
+  def render(%{user_profile: user_profile} = assigns, _interface) when not is_nil(user_profile) do
     ~LVN"""
     <.user_profile_sidebar
       user={@user_profile}

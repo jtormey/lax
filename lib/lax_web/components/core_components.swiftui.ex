@@ -260,6 +260,7 @@ defmodule LaxWeb.CoreComponents.SwiftUI do
 
   slot :inner_block, required: true
   slot :subtitle
+
   slot :actions do
     attr :placement, :string
   end

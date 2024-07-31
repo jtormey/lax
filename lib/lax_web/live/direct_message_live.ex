@@ -61,17 +61,15 @@ defmodule LaxWeb.DirectMessageLive do
 
   def render_action(%{live_action: :new} = assigns) do
     ~H"""
-    <%=
-      live_render(
-        @socket,
-        __MODULE__.NewDirectMessageLive,
-        id: "new_direct_message",
-        session: %{
-          "initial_user_ids" => @initial_user_ids
-        },
-        container: {:div, class: "flex flex-1 flex-col"}
-      )
-    %>
+    <%= live_render(
+      @socket,
+      __MODULE__.NewDirectMessageLive,
+      id: "new_direct_message",
+      session: %{
+        "initial_user_ids" => @initial_user_ids
+      },
+      container: {:div, class: "flex flex-1 flex-col"}
+    ) %>
     """
   end
 
