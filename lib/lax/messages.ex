@@ -63,9 +63,9 @@ defmodule Lax.Messages do
     Phoenix.PubSub.broadcast(Lax.PubSub, sent_messages_topic(channel), info)
 
     with {:ok, _} <- Application.ensure_all_started(:apns_default),
-          :direct_message <- channel.type
-    do
+         :direct_message <- channel.type do
       users = Repo.preload(channel, :users).users
+
       for user <- users, user.id != message.sent_by_user_id do
         for device_token <- user.apns_device_token do
           notification = Pigeon.APNS.Notification.new(message.text, device_token, channel.id)
