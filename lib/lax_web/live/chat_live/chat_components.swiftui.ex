@@ -188,7 +188,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       </Button>
       <HStack style='frame(maxWidth: :infinity);'>
         <VStack alignment="leading">
-          <Text markdown={@text} />
+          <Text markdown={@text} style="textSelection(.enabled);" />
         </VStack>
         <Spacer />
       </HStack>
@@ -217,11 +217,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         </VStack>
         <VStack alignment="leading">
           <HStack>
-            <.link navigate={@user_detail_patch}>
+            <Button style="buttonStyle(.plain);" phx-click="swiftui_user_detail_patch" phx-value-profile={@user_detail_patch}>
               <Text style="font(.headline); foregroundStyle(.primary);">
                 <%= @user.username %>
               </Text>
-            </.link>
+            </Button>
             <Spacer />
             <Text style="font(.caption2); foregroundStyle(.secondary); padding(.top, 4);">
               <%= @time %>
@@ -280,47 +280,59 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     """
   end
 
-  attr :user, Lax.Users.User, required: true
+  attr :user, Lax.Users.User
   attr :online_fun, :any, required: true
   attr :current_user, Lax.Users.User
+  slot :inner_block
 
   def user_profile_sidebar(assigns) do
     ~LVN"""
-    <ScrollView
+    <VStack
       style={[
-        ~s[tint(attr("display_color"))],
-        ~s[navigationTitle("Profile")]
+        ~s[inspector(isPresented: attr("is-presented"), content: :content)]
       ]}
-      display_color={@user.display_color}
+      is-presented={@user != nil}
+      phx-change="swiftui_user_detail_patch"
     >
-      <VStack
-        alignment="leading"
-        style="padding();"
+      <%= render_slot(@inner_block) %>
+      <ScrollView
+        template="content"
+        :if={@user}
+        style={[
+          ~s[tint(attr("display_color"))],
+          ~s[navigationTitle("Profile")]
+        ]}
+        display_color={@user.display_color}
       >
-        <.user_profile user={@user} online={@online_fun.(@user)} size={:xl} />
-        <Text style="font(.title2); bold();"><%= @user.username %></Text>
-
-        <LabeledContent>
-          <Text template="label">Status</Text>
-          <Text><%= if @online_fun.(@user), do: "Online", else: "Away" %></Text>
-        </LabeledContent>
-
-        <LabeledContent>
-          <% local_time = DateTime.shift_zone!(DateTime.utc_now(), @user.time_zone) %>
-          <% local_time_strftime = Calendar.strftime(local_time, "%-I:%M%P") %>
-          <Text template="label">Timezone</Text>
-          <Text><%= @user.time_zone %> (<%= local_time_strftime %> local)</Text>
-        </LabeledContent>
-
-        <.link
-          :if={@current_user}
-          navigate={~p"/new-direct-message?to_user=#{@user}"}
-          style='buttonStyle(.borderedProminent); controlSize(.large); padding(.vertical);'
+        <VStack
+          alignment="leading"
+          style="padding();"
         >
-          <Text style="frame(maxWidth: .infinity);">Direct message</Text>
-        </.link>
-      </VStack>
-    </ScrollView>
+          <.user_profile user={@user} online={@online_fun.(@user)} size={:xl} />
+          <Text style="font(.title2); bold();"><%= @user.username %></Text>
+
+          <LabeledContent>
+            <Text template="label">Status</Text>
+            <Text><%= if @online_fun.(@user), do: "Online", else: "Away" %></Text>
+          </LabeledContent>
+
+          <LabeledContent>
+            <% local_time = DateTime.shift_zone!(DateTime.utc_now(), @user.time_zone) %>
+            <% local_time_strftime = Calendar.strftime(local_time, "%-I:%M%P") %>
+            <Text template="label">Timezone</Text>
+            <Text><%= @user.time_zone %> (<%= local_time_strftime %> local)</Text>
+          </LabeledContent>
+
+          <.link
+            :if={@current_user}
+            navigate={~p"/new-direct-message?to_user=#{@user}"}
+            style='buttonStyle(.borderedProminent); controlSize(.large); padding(.vertical);'
+          >
+            <Text style="frame(maxWidth: .infinity);">Direct message</Text>
+          </.link>
+        </VStack>
+      </ScrollView>
+    </VStack>
     """
   end
 end
