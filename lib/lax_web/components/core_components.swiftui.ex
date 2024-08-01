@@ -280,7 +280,7 @@ defmodule LaxWeb.CoreComponents.SwiftUI do
       <ToolbarItemGroup
         :for={action <- @actions}
         template="toolbar"
-        placement={action.placement}
+        placement={Map.get(action, :placement, "automatic")}
       >
         <%= render_slot(action) %>
       </ToolbarItemGroup>
