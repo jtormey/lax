@@ -6,7 +6,6 @@
 import SwiftUI
 import LiveViewNative
 import LiveViewNativeLiveForm
-import NotificationCenter
 
 struct ContentView: View {
     @StateObject private var session = LiveSessionCoordinator(

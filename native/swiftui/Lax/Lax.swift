@@ -76,7 +76,11 @@ struct LiveAPNSHandlerModifier<Root: RootRegistry>: ViewModifier {
         content.onReceive(session.receiveEvent(Self.incomingEvent)) { (coordinator, message) in
             Task {
                 do {
-                    let granted = try await UNUserNotificationCenter.current().requestAuthorization()
+                    let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [
+                        .alert,
+                        .badge,
+                        .sound
+                    ])
                     let deviceToken = try await delegate.registerForRemoteNotifications()
                     try await coordinator.pushEvent(type: "click", event: Self.outgoingEvent, value: [
                         "granted": granted,
