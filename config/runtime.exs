@@ -65,6 +65,13 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :pigeon, :apns,
+    apns_default: %{
+      cert: System.fetch_env!("APNS_CERT_PEM"),
+      key: System.fetch_env!("APNS_KEY_UNENCRYPTED_PEM"),
+      mode: :prod
+    }
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
