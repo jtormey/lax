@@ -204,6 +204,10 @@ defmodule LaxWeb.ChatLive do
     {:noreply, push_navigate(socket, to: to)}
   end
 
+  def handle_event("swiftui_select_chat", %{ "selection" => id }, socket) do
+    {:noreply, apply_chat_params(socket, %{ "id" => id })}
+  end
+
   def handle_event("swiftui_user_detail_patch", %{"profile" => _user_id} = params, socket) do
     {:noreply, apply_profile_params(socket, params)}
   end
