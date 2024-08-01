@@ -74,6 +74,10 @@ defmodule LaxWeb.UserAuth do
   """
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
+
+    user = user_token && Users.get_user_by_session_token(user_token)
+    Users.update_user_apns_device_token(user, [])
+
     user_token && Users.delete_user_session_token(user_token)
 
     if live_socket_id = get_session(conn, :live_socket_id) do

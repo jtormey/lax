@@ -378,4 +378,10 @@ defmodule Lax.Users do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  def update_user_apns_device_token(user, attrs) do
+    user
+    |> User.apns_device_token_changeset(%{apns_device_token: attrs})
+    |> Repo.update()
+  end
 end

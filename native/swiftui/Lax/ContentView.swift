@@ -6,19 +6,20 @@
 import SwiftUI
 import LiveViewNative
 import LiveViewNativeLiveForm
+import NotificationCenter
 
 struct ContentView: View {
+    @StateObject private var session = LiveSessionCoordinator(
+        .automatic(
+            development: .localhost(path: "/"),
+            // development: URL(string: "https://lax.ngrok.io")!,
+            production: URL(string: "https://lax.fly.dev")!
+        ),
+        customRegistryType: LaxRegistry.self
+    )
+    
     var body: some View {
-        #LiveView(
-            .automatic(
-                development: .localhost(path: "/"),
-                // development: URL(string: "https://lax.ngrok.io")!,
-                production: URL(string: "https://lax.fly.dev")!
-            ),
-            addons: [
-                .liveForm
-            ]
-        ) {
+        LiveView(registry: LaxRegistry.self, session: session) {
             ConnectingView()
         } disconnected: {
             DisconnectedView()
@@ -29,5 +30,12 @@ struct ContentView: View {
         } error: { error in
             ErrorView(error: error)
         }
+        .liveAPNSHandler(session: session)
     }
+}
+
+struct LaxRegistry: AggregateRegistry {
+    #Registries<
+        Addons.LiveForm<Self>
+    >
 }

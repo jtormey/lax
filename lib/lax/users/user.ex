@@ -13,6 +13,7 @@ defmodule Lax.Users.User do
     field :time_zone, :string, default: "America/New_York"
     field :display_color, :string
     field :confirmed_at, :naive_datetime
+    field :apns_device_token, {:array, :string}, default: []
 
     embeds_one :ui_settings, UiSettings, on_replace: :update, primary_key: false do
       field :channels_sidebar_width, :integer, default: 250
@@ -180,6 +181,11 @@ defmodule Lax.Users.User do
       :direct_messages_sidebar_width,
       :profile_sidebar_width
     ])
+  end
+
+  def apns_device_token_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:apns_device_token])
   end
 
   @doc """

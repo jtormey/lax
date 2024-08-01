@@ -21,6 +21,12 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           <:option navigate={~p"/users/sign-out"} system_image="arrow.up.backward.square">
             Sign out
           </:option>
+          <:option :if={length(@current_user.apns_device_token) == 0} on_click="swiftui_register_apns" system_image="bell.badge">
+            Enable notifications
+          </:option>
+          <:option :if={length(@current_user.apns_device_token) > 0} on_click="swiftui_unregister_apns" system_image="bell.badge.slash">
+            Disable notifications
+          </:option>
           <.user_profile :if={@current_user} user={@current_user} size={:md} online />
         </.user_options>
       </:actions>

@@ -85,6 +85,13 @@ config :live_view_native_stylesheet,
   ],
   output: "priv/static/assets"
 
+config :pigeon, :apns,
+  apns_default: %{
+    cert: "cert.pem",
+    key: "key_unencrypted.pem",
+    mode: :dev
+  }
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
