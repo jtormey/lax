@@ -66,7 +66,9 @@ defmodule Lax.MixProject do
       {:live_view_native_swiftui,
        github: "liveview-native/liveview-client-swiftui", branch: "main"},
       {:live_view_native_live_form,
-       github: "liveview-native/liveview-native-live-form", branch: "main"}
+       github: "liveview-native/liveview-native-live-form", branch: "main"},
+      {:pigeon, "~> 1.6.2"},
+      {:kadabra, "~> 0.6.0"}
     ]
   end
 

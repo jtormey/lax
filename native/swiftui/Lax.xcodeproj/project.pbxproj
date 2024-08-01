@@ -30,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00D886812C5BC95300E6288D /* Lax.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Lax.entitlements; sourceTree = "<group>"; };
 		1AF6ED9F8B135A82A435260A /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		256E05AE1C6592802B303165 /* Lax.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lax.swift; sourceTree = "<group>"; };
 		4B2911F98297AEA54893781D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -67,6 +68,7 @@
 		41BA576AE9B28037391C2069 /* Lax */ = {
 			isa = PBXGroup;
 			children = (
+				00D886812C5BC95300E6288D /* Lax.entitlements */,
 				89990F0B9466898A90283FC1 /* Preview Content */,
 				CC56C04585E8858E3FFCB5F5 /* Assets.xcassets */,
 				C7CC5C1A3BF79B9860CB0579 /* ConnectingView.swift */,
@@ -246,6 +248,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Lax/Lax.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 4TP757LC3E;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -420,6 +423,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Lax/Lax.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 4TP757LC3E;
 				LD_RUNPATH_SEARCH_PATHS = (

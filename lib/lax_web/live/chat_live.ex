@@ -207,8 +207,27 @@ defmodule LaxWeb.ChatLive do
   def handle_event("swiftui_user_detail_patch", %{"profile" => _user_id} = params, socket) do
     {:noreply, apply_profile_params(socket, params)}
   end
+
   def handle_event("swiftui_user_detail_patch", _params, socket) do
     {:noreply, assign(socket, user_profile: nil)}
+  end
+
+  def handle_event("swiftui_unregister_apns", _params, socket) do
+    {:ok, user} = Users.update_user_apns_device_token(socket.assigns.current_user, [])
+    {:noreply, assign(socket, :current_user, user)}
+  end
+
+  def handle_event("swiftui_register_apns" = event, params, socket) do
+    {:noreply, push_event(socket, event, params)}
+  end
+
+  def handle_event("swiftui_apns_device_token", %{"device_token" => device_token}, socket) do
+    {:ok, user} = Users.update_user_apns_device_token(socket.assigns.current_user, [device_token])
+    {:noreply, assign(socket, :current_user, user)}
+  end
+
+  def handle_event("swiftui_apns_device_token", %{"error" => _error}, socket) do
+    {:noreply, put_flash(socket, :error, "Failed to register with push notification service")}
   end
 
   def handle_event("swiftui_" <> event, params, socket) do

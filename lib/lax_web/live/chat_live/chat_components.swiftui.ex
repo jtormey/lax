@@ -37,6 +37,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   slot :option do
     attr :navigate, :string
+    attr :on_click, :string
     attr :system_image, :string
   end
 
@@ -48,11 +49,22 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       <Group template="label">
         <%= render_slot(@inner_block) %>
       </Group>
-      <.link :for={option <- @option} navigate={option[:navigate]}>
-        <Label systemImage={option[:system_image]}>
-          <%= render_slot(option) %>
-        </Label>
-      </.link>
+      <%= for option <- @option do %>
+        <%= cond do %>
+        <% navigate = option[:navigate] -> %>
+          <.link navigate={navigate}>
+            <Label systemImage={option[:system_image]}>
+              <%= render_slot(option) %>
+            </Label>
+          </.link>
+        <% on_click = option[:on_click] -> %>
+          <.button phx-click={on_click}>
+            <Label systemImage={option[:system_image]}>
+              <%= render_slot(option) %>
+            </Label>
+          </.button>
+        <% end %>
+      <% end %>
     </Menu>
     """
   end
