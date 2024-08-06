@@ -14,6 +14,8 @@ defmodule Lax.Application do
       {Phoenix.PubSub, name: Lax.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Lax.Finch},
+      # Task supervisor for sending pigeon push notifications async
+      {Task.Supervisor, name: Lax.PigeonSupervisor},
       # Start a worker by calling: Lax.Worker.start_link(arg)
       # {Lax.Worker, arg},
       # Start to serve requests, typically the last entry

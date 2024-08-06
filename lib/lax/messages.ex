@@ -71,9 +71,11 @@ defmodule Lax.Messages do
           bundle_id = "com.example.Lax"
           message_body = "@#{message.sent_by_user.username}: #{message.text}"
 
-          message_body
-          |> Pigeon.APNS.Notification.new(device_token, bundle_id)
-          |> Pigeon.APNS.push()
+          Task.Supervisor.start_child(Lax.PigeonSupervisor, fn ->
+            message_body
+            |> Pigeon.APNS.Notification.new(device_token, bundle_id)
+            |> Pigeon.APNS.push()
+          end)
         end
       end
     end
