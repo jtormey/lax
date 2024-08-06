@@ -24,7 +24,7 @@ const ControlTextarea = {
           // remove focus from input so phoenix will overwrite the value
           // https://github.com/phoenixframework/phoenix_live_view/issues/624#issuecomment-585230754
           submitButton.focus();
-          form.dispatchEvent(new Event("submit", { bubbles: true }));
+          submitButton.click();
 
           // refocus on input after timeout
           setTimeout(() => {
