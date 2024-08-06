@@ -67,8 +67,8 @@ if config_env() == :prod do
 
   config :pigeon, :apns,
     apns_default: %{
-      cert: System.fetch_env!("APNS_CERT_PEM"),
-      key: System.fetch_env!("APNS_KEY_UNENCRYPTED_PEM"),
+      cert: File.read!("/app/secret/apns/cert.pem"),
+      key: File.read!("/app/secret/apns/key_unencrypted.pem"),
       mode: :prod
     }
 

@@ -19,7 +19,7 @@ struct Lax: App {
     }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
+class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject, UNUserNotificationCenterDelegate {
     let didRegisterForRemoteNotifications = CurrentValueSubject<String?, any Error>(nil)
     
     func application(
@@ -36,6 +36,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         self.didRegisterForRemoteNotifications.send(completion: .failure(error))
     }
     
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        return true
+    }
+
     private var cancellables = Set<AnyCancellable>()
     
     func registerForRemoteNotifications(_ completion: @escaping (Result<String, any Error>) -> ()) {
@@ -62,6 +67,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         try await withCheckedThrowingContinuation { continuation in
             registerForRemoteNotifications(continuation.resume(with:))
         }
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        [.list, .banner]
     }
 }
 

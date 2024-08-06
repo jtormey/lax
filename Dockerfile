@@ -51,6 +51,8 @@ COPY lib lib
 
 COPY assets assets
 
+COPY secret secret
+
 # compile assets
 RUN mix assets.deploy
 
@@ -84,8 +86,9 @@ RUN chown nobody /app
 # set runner ENV
 ENV MIX_ENV="prod"
 
-# Only copy the final release from the build stage
+# Only copy the final release and secrets from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/lax ./
+COPY --from=builder --chown=nobody:root /app/secret secret
 
 USER nobody
 

@@ -87,3 +87,12 @@ config :swoosh, :api_client, false
 config :live_view_native_stylesheet,
   annotations: true,
   pretty: true
+
+## Uncomment to enable push notifications in dev
+
+# config :pigeon, :apns,
+#   apns_default: %{
+#     cert: "secret/apns/cert.pem",
+#     key: "secret/apns/key_unencrypted.pem",
+#     mode: :dev
+#   }
