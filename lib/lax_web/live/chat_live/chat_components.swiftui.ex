@@ -347,10 +347,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     ~LVN"""
     <Text
       style={[
-        "font(.subheadline);",
+        "font(.subheadline)",
         "padding(.horizontal); padding(.vertical, 12);",
-        "overlay(content: :border);",
-        "padding(.horizontal); padding(.vertical);",
+        "frame(maxWidth: .infinity)",
+        "overlay(content: :border)",
+        "padding(.horizontal); padding(.vertical)"
       ]}
     >
       <RoundedRectangle template={:border} cornerRadius={4} style="stroke(.gray);" />
