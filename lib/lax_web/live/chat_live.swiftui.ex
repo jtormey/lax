@@ -141,7 +141,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
             <Image template="label" systemName="plus" />
 
             <.button phx-click="show_manage_channels">
-              <Label systemImage="plus">Join Channel</Label>
+              <Label systemImage="person.badge.plus">Join Channel</Label>
             </.button>
             <.button phx-click="show_new_channel">
               <Label systemImage="square.and.pencil">Create Channel</Label>
