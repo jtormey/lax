@@ -3,6 +3,7 @@ defmodule LaxWeb.ChatLive do
   use LaxNative, :live_view
 
   alias Lax.Chat
+  alias Lax.Channels
   alias Lax.Messages.Message
   alias Lax.Users
   alias LaxWeb.ChatLive.ChannelChatComponent
@@ -131,6 +132,7 @@ defmodule LaxWeb.ChatLive do
      |> assign(:domain, :home)
      |> assign(:modal, nil)
      |> assign(:chat, Chat.load(socket.assigns.current_user))
+     |> assign(:channels, Channels.list(:channel))
      |> ChannelChatComponent.handle_form()
      |> LaxWeb.Presence.Live.track_online_users()}
   end
@@ -232,6 +234,14 @@ defmodule LaxWeb.ChatLive do
 
   def handle_event("swiftui_apns_device_token", %{"error" => _error}, socket) do
     {:noreply, put_flash(socket, :error, "Failed to register with push notification service")}
+  end
+
+  def handle_event("swiftui_leave_channel", params, socket) do
+    ManageChannelsComponent.handle_event("leave", params, socket)
+  end
+
+  def handle_event("swiftui_join_channel", params, socket) do
+    ManageChannelsComponent.handle_event("join", params, socket)
   end
 
   def handle_event("swiftui_" <> event, params, socket) do
