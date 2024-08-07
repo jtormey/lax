@@ -44,7 +44,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
     <NavigationSplitView>
       <Group template="sidebar">
-        <.workspace_list selection={@chat.current_channel.id} phx-change="swiftui_select_chat">
+        <.workspace_list id="sidebar_list" selection={@chat.current_channel.id} phx-change="swiftui_select_chat">
           <.workspace_section title="Channels">
             <.channel_item
               :for={channel <- @chat.channels}
@@ -140,7 +140,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
     <.tab_bar phx-change="swiftui_tab_selection" selection={@swiftui_tab}>
       <.tab tag={:home} name="Home" icon_system_name="house">
-        <.workspace_list>
+        <.workspace_list id="home_list">
           <.workspace_section title="Channels">
             <.channel_item
               :for={channel <- @chat.channels}
