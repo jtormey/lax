@@ -228,14 +228,23 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </Group>
     </VStack>
 
-    <.modal :if={@modal == :new_channel} id="new_channel_modal" show on_cancel="hide_modal">
-      <.simple_form for={@swiftui_channel_form} phx-change="swiftui_channel_form_validate" phx-submit="swiftui_channel_form_submit">
-        <.input field={@swiftui_channel_form[:name]} label="Name" style="textInputAutocapitalization(.never); autocorrectionDisabled();" />
-        <:actions>
+    <VStack
+      :if={@modal == :new_channel}
+      style={[
+        "hidden()",
+        ~s[alert("Create Channel", isPresented: attr("isPresented"), actions: :actions, message: :message)]
+      ]}
+      isPresented={true}
+      phx-change="hide_modal"
+    >
+      <Group template="actions">
+        <.form for={@swiftui_channel_form} phx-change="swiftui_channel_form_validate" phx-submit="swiftui_channel_form_submit">
+          <.input field={Map.put(@swiftui_channel_form[:name], :errors, [])} label="Name" style="textInputAutocapitalization(.never); autocorrectionDisabled();" />
           <.button type="submit">Create</.button>
-        </:actions>
-      </.simple_form>
-    </.modal>
+        </.form>
+        <Button role="cancel">Cancel</Button>
+      </Group>
+    </VStack>
     """
   end
 

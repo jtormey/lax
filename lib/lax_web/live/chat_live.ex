@@ -255,7 +255,13 @@ defmodule LaxWeb.ChatLive do
       nil ->
         {:noreply, socket}
       changeset ->
-        {:noreply, assign(socket, :swiftui_channel_form, to_form(changeset, as: :channel))}
+        {:noreply,
+          socket
+          |> assign(:swiftui_channel_form, to_form(%{}, as: :channel))
+          |> put_flash(
+            :error,
+            elem(Enum.into(changeset.errors, %{}).name, 0)
+          )}
     end
   end
 
