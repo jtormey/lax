@@ -134,7 +134,8 @@ defmodule LaxWeb.ChatLive do
      |> assign(:chat, Chat.load(socket.assigns.current_user))
      |> assign(:channels, Channels.list(:channel))
      |> ChannelChatComponent.handle_form()
-     |> LaxWeb.Presence.Live.track_online_users()}
+     |> LaxWeb.Presence.Live.track_online_users()
+     |> assign(:swiftui_channel_form, to_form(%{}, as: :channel))}
   end
 
   def handle_params(params, _uri, socket) do
@@ -244,17 +245,33 @@ defmodule LaxWeb.ChatLive do
     ManageChannelsComponent.handle_event("join", params, socket)
   end
 
+  def handle_event("swiftui_channel_form_validate", params, socket) do
+    {:noreply, new_socket} = ChannelFormComponent.handle_event("validate", params, socket)
+    {:noreply, assign(socket, :swiftui_channel_form, new_socket.assigns.form)}
+  end
+
+  def handle_event("swiftui_channel_form_submit", params, socket) do
+    case ChannelFormComponent.create_channel(socket.assigns.current_user, params, false) do
+      nil ->
+        {:noreply, socket}
+      changeset ->
+        {:noreply, assign(socket, :swiftui_channel_form, to_form(changeset, as: :channel))}
+    end
+  end
+
   def handle_event("swiftui_" <> event, params, socket) do
     ChannelChatComponent.handle_event(event, params, socket)
   end
 
   ## /SwiftUI
 
-  def handle_info({ChannelFormComponent, {:create_channel, channel}}, socket) do
-    {:noreply,
-     socket
-     |> assign(:modal, nil)
-     |> push_patch(to: ~p"/chat/#{channel}")}
+  def handle_info({ChannelFormComponent, {:create_channel, channel, patch?}}, socket) do
+    socket = assign(socket, :modal, nil)
+    if patch? do
+      {:noreply, push_patch(socket, to: ~p"/chat/#{channel}")}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_info({ManageChannelsComponent, :update_channels}, socket) do

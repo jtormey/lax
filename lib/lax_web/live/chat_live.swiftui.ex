@@ -137,9 +137,16 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </:actions>
       <:actions placement="navigation">
         <Group>
-          <.button :if={@current_user != nil and @swiftui_tab == :home} phx-click="show_manage_channels">
-            <Image systemName="plus" />
-          </.button>
+          <Menu :if={@current_user != nil and @swiftui_tab == :home}>
+            <Image template="label" systemName="plus" />
+
+            <.button phx-click="show_manage_channels">
+              <Label systemImage="plus">Join Channel</Label>
+            </.button>
+            <.button phx-click="show_new_channel">
+              <Label systemImage="square.and.pencil">Create Channel</Label>
+            </.button>
+          </Menu>
           <.link :if={@current_user != nil and @swiftui_tab == :direct_messages} navigate={~p"/new-direct-message"}>
             <Image systemName="square.and.pencil" />
           </.link>
@@ -220,6 +227,15 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         </Button>
       </Group>
     </VStack>
+
+    <.modal :if={@modal == :new_channel} id="new_channel_modal" show on_cancel="hide_modal">
+      <.simple_form for={@swiftui_channel_form} phx-change="swiftui_channel_form_validate" phx-submit="swiftui_channel_form_submit">
+        <.input field={@swiftui_channel_form[:name]} label="Name" style="textInputAutocapitalization(.never); autocorrectionDisabled();" />
+        <:actions>
+          <.button type="submit">Create</.button>
+        </:actions>
+      </.simple_form>
+    </.modal>
     """
   end
 
