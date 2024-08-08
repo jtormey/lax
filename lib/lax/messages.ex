@@ -76,7 +76,7 @@ defmodule Lax.Messages do
               nil
             users ->
               users
-              |> Enum.reduce({"To You", length(users) - 2}, fn
+              |> Enum.reduce({"To You", length(users)}, fn
                 user, {"", l} ->
                   {"@#{user.username}", l - 1}
                 user, {acc, 1} ->
