@@ -5,6 +5,7 @@
 
 import SwiftUI
 import LiveViewNative
+import LiveViewNativeLiveForm
 import Combine
 import UserNotifications
 
@@ -18,17 +19,47 @@ struct Lax: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(session: delegate.session)
                 .environmentObject(delegate)
         }
     }
 }
 
-#if os(macOS)
-class AppDelegate: NSObject, NSApplicationDelegate {
-    private let didRegisterForRemoteNotifications = CurrentValueSubject<String?, any Error>(nil)
-    private var cancellables = Set<AnyCancellable>()
+struct LaxRegistry: AggregateRegistry {
+    #Registries<
+        Addons.LiveForm<Self>,
+        Addons.Lax<Self>
+    >
+}
+
+@MainActor
+class AppDelegate: NSObject {
+    /// A subject that publishes a value when a notification is tapped.
+    ///
+    /// The current value is stored, and should be reset to `nil` after being handled.
+    /// A `PassthroughSubject` may not have a subscriber setup before the delegate receives the notification event.
+    let notificationNavigateRequest = CurrentValueSubject<String?, Never>(nil)
     
+    /// A subject used internally by ``registerForRemoteNotifications()``.
+    ///
+    /// This subject enables the `didRegisterForRemoteNotificationsWithDeviceToken` event to be handled asynchronously.
+    let didRegisterForRemoteNotifications = CurrentValueSubject<String?, any Error>(nil)
+    
+    /// The coordinator for the app's `LiveView`.
+    private(set) var session = LiveSessionCoordinator(
+        .automatic(
+            development: .localhost(path: "/"),
+            // development: URL(string: "https://lax.ngrok.io")!,
+            production: URL(string: "https://lax.fly.dev")!
+        ),
+        customRegistryType: LaxRegistry.self
+    )
+    
+    private var cancellables = Set<AnyCancellable>()
+}
+
+#if os(macOS)
+extension AppDelegate: NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
     }
@@ -42,9 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 #else
-class AppDelegate: NSObject, UIApplicationDelegate {
-    let didRegisterForRemoteNotifications = CurrentValueSubject<String?, any Error>(nil)
-    
+extension AppDelegate: UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         return true
@@ -63,8 +92,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) {
         self.didRegisterForRemoteNotifications.send(completion: .failure(error))
     }
-
-    private var cancellables = Set<AnyCancellable>()
 }
 #endif
 
@@ -93,6 +120,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate, ObservableObject {
         }
     }
     
+    /// Registers for remote notifications on the `UIApplication` asynchronously and returns the device token.
     func registerForRemoteNotifications() async throws -> String {
         try await withCheckedThrowingContinuation { continuation in
             registerForRemoteNotifications(continuation.resume(with:))
@@ -100,7 +128,20 @@ extension AppDelegate: UNUserNotificationCenterDelegate, ObservableObject {
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        [.list, .banner]
+        // display notifications when the app is foregrounded, and not already in the notification's chat.
+        if let navigate = notification.request.content.userInfo["navigate"] as? String,
+           session.navigationPath.last?.url.path() == "/chat/\(navigate)/"
+        {
+            return []
+        } else {
+            return [.list, .banner]
+        }
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        if let navigate = response.notification.request.content.userInfo["navigate"] as? String {
+            notificationNavigateRequest.send(navigate)
+        }
     }
 }
 
@@ -139,5 +180,61 @@ struct LiveAPNSHandlerModifier<Root: RootRegistry>: ViewModifier {
 extension View {
     func liveAPNSHandler(session: LiveSessionCoordinator<some RootRegistry>) -> some View {
         modifier(LiveAPNSHandlerModifier(session: session))
+    }
+}
+
+/// A View that watches for navigation requests from tapping on a notification.
+///
+/// The event passed to `onReceive` will be sent when a notification is tapped.
+///
+/// ```html
+/// <NotificationLaunchObserver onReceive="handle-notification" />
+/// ```
+///
+/// ```elixir
+/// def handle_event("handle-notification", %{ "id" => channel_id }, socket) do
+///   ...
+/// end
+/// ```
+@LiveElement
+struct NotificationLaunchObserver<Root: RootRegistry>: View {
+    @LiveElementIgnored
+    @EnvironmentObject
+    private var delegate: AppDelegate
+    
+    private var onReceive: String = ""
+    
+    private var replace: Bool = false
+    
+    var body: some View {
+        VStack {}
+            .hidden()
+            .onReceive(delegate.notificationNavigateRequest) { channelID in
+                guard let channelID else { return }
+                delegate.notificationNavigateRequest.value = nil
+                Task {
+                    do {
+                        try await $liveElement.context.coordinator.pushEvent(type: "click", event: onReceive, value: ["id": channelID, "replace": replace])
+                    } catch {
+                        print(error)
+                    }
+                }
+            }
+    }
+}
+
+extension Addons {
+    @Addon
+    struct Lax<Root: RootRegistry> {
+        enum TagName: String {
+            case notificationLaunchObserver = "NotificationLaunchObserver"
+        }
+        
+        static func lookup(_ name: TagName, element: ElementNode) -> some View {
+            switch name {
+            case .notificationLaunchObserver:
+                NotificationLaunchObserver<Root>()
+            }
+        }
     }
 }
