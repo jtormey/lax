@@ -97,7 +97,8 @@ defmodule Lax.Messages do
                     "body" => message.text
                   },
                   "thread-id" => channel.id
-                }
+                },
+                "navigate" => channel.id
               })
             Pigeon.APNS.push(notification)
           end)
