@@ -9,6 +9,105 @@ defmodule LaxWeb.ChatLive.SwiftUI do
   import LaxWeb.DirectMessageLive.Components.SwiftUI
   import LaxWeb.UserLive.Components.SwiftUI
 
+  def render(assigns, %{"target" => "macos" = target}) do
+    assigns = assign(assigns, target: target)
+    ~LVN"""
+    <.header>
+      Workspace
+      <:actions placement="automatic">
+        <.link :if={!@current_user} navigate={~p"/users/register"} class="font-weight-semibold fg-tint">
+          Sign in or register
+        </.link>
+        <.user_options :if={@current_user}>
+          <:option navigate={~p"/users/sign-out"} system_image="arrow.up.backward.square">
+            Sign out
+          </:option>
+          <:option :if={length(@current_user.apns_device_token) == 0} on_click="swiftui_register_apns" system_image="bell.badge">
+            Enable notifications
+          </:option>
+          <:option :if={length(@current_user.apns_device_token) > 0} on_click="swiftui_unregister_apns" system_image="bell.badge.slash">
+            Disable notifications
+          </:option>
+          <Text><%= @current_user.username %></Text>
+        </.user_options>
+      </:actions>
+      <:actions placement="automatic">
+        <Group>
+          <.link :if={@current_user != nil} navigate={~p"/new-direct-message"}>
+            <Label systemImage="square.and.pencil">
+              Direct Message
+            </Label>
+          </.link>
+        </Group>
+      </:actions>
+    </.header>
+
+    <NavigationSplitView>
+      <Group template="sidebar">
+        <.workspace_list id="sidebar_list" selection={@chat.current_channel.id} phx-change="swiftui_select_chat">
+          <.workspace_section title="Channels">
+            <.channel_item
+              :for={channel <- @chat.channels}
+              name={channel.name}
+              active={Chat.has_activity?(@chat, channel)}
+              unread_count={Chat.unread_count(@chat, channel)}
+              target={@target}
+              id={channel.id}
+            />
+          </.workspace_section>
+
+          <.workspace_section title="Direct messages">
+            <.direct_message_item
+              :for={channel <- @chat.direct_messages}
+              users={Chat.direct_message_users(@chat, channel)}
+              active={Chat.has_activity?(@chat, channel)}
+              online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+              unread_count={Chat.unread_count(@chat, channel)}
+              target={@target}
+              id={channel.id}
+            />
+            <:footer :if={!@current_user}>
+              Sign in to use the direct messaging feature.
+            </:footer>
+          </.workspace_section>
+        </.workspace_list>
+      </Group>
+      <Group template="content" :if={@chat}>
+        <.user_profile_sidebar
+          user={@user_profile}
+          online_fun={&LaxWeb.Presence.Live.online?(assigns, &1)}
+          current_user={@current_user}
+        >
+          <.chat animation_key={length(@chat.messages)} target={@target}>
+            <.message
+              :for={message <- Enum.reverse(group_messages(@chat.messages))}
+              message_id={message.id}
+              user={message.sent_by_user}
+              user_detail_patch={message.sent_by_user.id}
+              online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
+              time={Message.show_time(message, @current_user && @current_user.time_zone)}
+              text={message.text}
+              compact={message.compact}
+              on_delete={@current_user && @current_user.id == message.sent_by_user_id && "delete_message"}
+            />
+            <:bottom_bar>
+              <.chat_form
+                :if={@current_user}
+                placeholder={LaxWeb.ChatLive.ChannelChatComponent.placeholder(@chat.current_channel)}
+                form={@chat_form}
+                target={@target}
+                phx-change="swiftui_validate"
+                phx-submit="swiftui_submit"
+              />
+              <.chat_signed_out_notice :if={!@current_user} />
+            </:bottom_bar>
+          </.chat>
+        </.user_profile_sidebar>
+      </Group>
+    </NavigationSplitView>
+    """
+  end
+
   def render(%{live_action: :chat} = assigns, _interface) do
     ~LVN"""
     <.header>
@@ -41,7 +140,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
     <.tab_bar phx-change="swiftui_tab_selection" selection={@swiftui_tab}>
       <.tab tag={:home} name="Home" icon_system_name="house">
-        <.workspace_list>
+        <.workspace_list id="home_list">
           <.workspace_section title="Channels">
             <.channel_item
               :for={channel <- @chat.channels}

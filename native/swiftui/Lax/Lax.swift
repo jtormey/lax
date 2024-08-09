@@ -6,10 +6,15 @@
 import SwiftUI
 import LiveViewNative
 import Combine
+import UserNotifications
 
 @main
 struct Lax: App {
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    #else
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    #endif
     
     var body: some Scene {
         WindowGroup {
@@ -19,8 +24,31 @@ struct Lax: App {
     }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject, UNUserNotificationCenterDelegate {
+#if os(macOS)
+class AppDelegate: NSObject, NSApplicationDelegate {
+    private let didRegisterForRemoteNotifications = CurrentValueSubject<String?, any Error>(nil)
+    private var cancellables = Set<AnyCancellable>()
+    
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        UNUserNotificationCenter.current().delegate = self
+    }
+    
+    func application(_ application: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        self.didRegisterForRemoteNotifications.send(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())
+    }
+    
+    func application(_ application: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: any Error) {
+        self.didRegisterForRemoteNotifications.send(completion: .failure(error))
+    }
+}
+#else
+class AppDelegate: NSObject, UIApplicationDelegate {
     let didRegisterForRemoteNotifications = CurrentValueSubject<String?, any Error>(nil)
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        return true
+    }
     
     func application(
         _ application: UIApplication,
@@ -35,14 +63,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject, UNUserNoti
     ) {
         self.didRegisterForRemoteNotifications.send(completion: .failure(error))
     }
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
-        return true
-    }
 
     private var cancellables = Set<AnyCancellable>()
-    
+}
+#endif
+
+extension AppDelegate: UNUserNotificationCenterDelegate, ObservableObject {
     func registerForRemoteNotifications(_ completion: @escaping (Result<String, any Error>) -> ()) {
         if let deviceToken = self.didRegisterForRemoteNotifications.value {
             completion(.success(deviceToken))
@@ -59,7 +85,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, ObservableObject, UNUserNoti
                 completion(.success(deviceToken))
             }
             .store(in: &cancellables)
+            #if os(macOS)
+            NSApplication.shared.registerForRemoteNotifications()
+            #else
             UIApplication.shared.registerForRemoteNotifications()
+            #endif
         }
     }
     

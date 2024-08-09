@@ -69,11 +69,12 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     """
   end
 
+  attr :rest, :global
   slot :inner_block, required: true
 
   def workspace_list(assigns) do
     ~LVN"""
-    <List>
+    <List {@rest}>
       <%= render_slot(@inner_block) %>
     </List>
     """
@@ -100,8 +101,16 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   attr :name, :string, required: true
   attr :active, :boolean, default: false
   attr :unread_count, :integer, default: 0
-  attr :rest, :global, include: ~w(navigate)
+  attr :target, :string, default: "ios"
+  attr :rest, :global, include: ~w(navigate id)
 
+  def channel_item(%{target: "macos"} = assigns) do
+    ~LVN"""
+    <LabeledContent {@rest} style='badge(attr("count"))' count={@unread_count}>
+      <Text template="label"># <%= @name %></Text>
+    </LabeledContent>
+    """
+  end
   def channel_item(assigns) do
     ~LVN"""
     <.link {@rest}>
@@ -117,8 +126,21 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   attr :active, :boolean, default: false
   attr :online_fun, :any, required: true
   attr :unread_count, :integer, default: 0
-  attr :rest, :global, include: ~w(navigate)
+  attr :target, :string, default: "ios"
+  attr :rest, :global, include: ~w(navigate id)
 
+  def direct_message_item(%{target: "macos"} = assigns) do
+    ~LVN"""
+    <LabeledContent {@rest} style='badge(attr("count"));' count={@unread_count}>
+        <HStack template="label">
+          <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
+          <Text>
+            <%= Enum.map_join(@users, ", ", & &1.username) %>
+          </Text>
+        </HStack>
+      </LabeledContent>
+    """
+  end
   def direct_message_item(assigns) do
     ~LVN"""
     <.link {@rest}>
@@ -154,8 +176,27 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   end
 
   attr :animation_key, :any
+  attr :target, :string, default: "ios"
   slot :inner_block
   slot :bottom_bar
+
+  def chat(%{target: "macos"} = assigns) do
+    ~LVN"""
+    <ScrollView style="scrollDismissesKeyboard(.immediately); defaultScrollAnchor(.bottom); safeAreaInset(edge: .bottom, content: :bottom_bar);">
+      <VStack
+        alignment="leading"
+        style='frame(maxWidth: .infinity, alignment: .leading); animation(.default, value: attr("animation_key")); padding(.top);'
+        animation_key={@animation_key}
+      >
+        <%= render_slot(@inner_block) %>
+      </VStack>
+      <VStack spacing="0" template={:bottom_bar} style="background(.bar, in: .rect(cornerRadius: 8)); background(content: :stroke); padding();">
+        <%= render_slot(@bottom_bar) %>
+        <RoundedRectangle template="stroke" cornerRadius="8" style="stroke(.separator, lineWidth: 2);" />
+      </VStack>
+    </ScrollView>
+    """
+  end
 
   def chat(assigns) do
     ~LVN"""
@@ -249,7 +290,33 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
 
   attr :form, Phoenix.HTML.Form, required: true
   attr :placeholder, :string, required: true
+  attr :target, :string, default: "ios"
   attr :rest, :global, include: ~w(phx-change phx-submit phx-target)
+
+  def chat_form(%{target: "macos"} = assigns) do
+    ~LVN"""
+    <VStack alignment="trailing" style="padding(.leading); padding(.vertical, 8); padding(.trailing, 8);">
+      <.form {@rest} for={@form}>
+        <.input
+          field={Map.put(@form[:text], :errors, [])}
+          placeholder={@placeholder}
+          style="textFieldStyle(.plain); padding(.vertical, 4);"
+          axis="vertical"
+        />
+        <LiveSubmitButton
+          style={[
+            "buttonStyle(.borderedProminent)",
+            ~s[disabled(attr("disabled"))]
+          ]}
+          after-submit="clear"
+          disabled={not @form.source.valid?}
+        >
+          <Image systemName="paperplane.fill" style="padding(4);" />
+        </LiveSubmitButton>
+      </.form>
+    </VStack>
+    """
+  end
 
   def chat_form(assigns) do
     ~LVN"""
@@ -280,10 +347,11 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     ~LVN"""
     <Text
       style={[
-        "font(.subheadline);",
+        "font(.subheadline)",
         "padding(.horizontal); padding(.vertical, 12);",
-        "overlay(content: :border);",
-        "padding(.horizontal); padding(.vertical);",
+        "frame(maxWidth: .infinity)",
+        "overlay(content: :border)",
+        "padding(.horizontal); padding(.vertical)"
       ]}
     >
       <RoundedRectangle template={:border} cornerRadius={4} style="stroke(.gray);" />
