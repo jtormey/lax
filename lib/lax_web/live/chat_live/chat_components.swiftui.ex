@@ -103,21 +103,33 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   attr :unread_count, :integer, default: 0
   attr :target, :string, default: "ios"
   attr :rest, :global, include: ~w(navigate id)
+  slot :menu_items
 
   def channel_item(%{target: "macos"} = assigns) do
     ~LVN"""
-    <LabeledContent {@rest} style='badge(attr("count"))' count={@unread_count}>
-      <Text template="label"># <%= @name %></Text>
-    </LabeledContent>
-    """
-  end
-  def channel_item(assigns) do
-    ~LVN"""
-    <.link {@rest}>
-      <LabeledContent style='badge(attr("count"))' count={@unread_count}>
+    <Group style='contextMenu(menuItems: :menu_items);'>
+      <LabeledContent {@rest} style='badge(attr("count"))' count={@unread_count}>
         <Text template="label"># <%= @name %></Text>
       </LabeledContent>
-    </.link>
+      <Group template="menu_items">
+        <%= render_slot(@menu_items) %>
+      </Group>
+    </Group>
+    """
+  end
+
+  def channel_item(assigns) do
+    ~LVN"""
+    <Group style='contextMenu(menuItems: :menu_items);'>
+      <.link {@rest}>
+        <LabeledContent style='badge(attr("count"))' count={@unread_count}>
+          <Text template="label"># <%= @name %></Text>
+        </LabeledContent>
+      </.link>
+      <Group template="menu_items">
+        <%= render_slot(@menu_items) %>
+      </Group>
+    </Group>
     """
   end
 
