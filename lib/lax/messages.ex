@@ -71,7 +71,7 @@ defmodule Lax.Messages do
       for user <- users, user.id != message.sent_by_user_id do
         for device_token <- user.apns_device_token do
           bundle_id = "com.example.Lax"
-          subtitle = case Enum.filter(users, &(&1 != user and &1 != sender)) do
+          subtitle = case Enum.filter(users, &(&1.id != user.id and &1.id != sender.id)) do
             [] ->
               nil
             users ->
