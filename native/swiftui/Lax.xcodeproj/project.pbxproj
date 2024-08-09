@@ -497,7 +497,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/liveview-native/liveview-native-live-form";
 			requirement = {
-				branch = "addons-macro";
+				branch = main;
 				kind = branch;
 			};
 		};

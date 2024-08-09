@@ -65,16 +65,42 @@ defmodule Lax.Messages do
     with pid when pid != nil <- GenServer.whereis(:apns_default),
          :direct_message <- channel.type do
       users = Repo.preload(channel, :users).users
+      sender = message.sent_by_user
+      title = "@#{sender.username}"
 
       for user <- users, user.id != message.sent_by_user_id do
         for device_token <- user.apns_device_token do
           bundle_id = "com.example.Lax"
-          message_body = "@#{message.sent_by_user.username}: #{message.text}"
+          subtitle = case Enum.filter(users, &(&1.id != user.id and &1.id != sender.id)) do
+            [] ->
+              nil
+            users ->
+              users
+              |> Enum.reduce({"To You", length(users)}, fn
+                user, {"", l} ->
+                  {"@#{user.username}", l - 1}
+                user, {acc, 1} ->
+                  {"#{acc} & @#{user.username}", 0}
+                user, {acc, l} ->
+                  {"#{acc}, @#{user.username}", l - 1}
+              end)
+              |> elem(0)
+          end
 
           Task.Supervisor.start_child(Lax.PigeonSupervisor, fn ->
-            message_body
-            |> Pigeon.APNS.Notification.new(device_token, bundle_id)
-            |> Pigeon.APNS.push()
+            notification = Pigeon.APNS.Notification.new("", device_token, bundle_id)
+              |> Pigeon.APNS.Notification.put_custom(%{
+                "aps" => %{
+                  "alert" => %{
+                    "title" => title,
+                    "subtitle" => subtitle,
+                    "body" => message.text
+                  },
+                  "thread-id" => channel.id
+                },
+                "navigate" => channel.id
+              })
+            Pigeon.APNS.push(notification)
           end)
         end
       end
