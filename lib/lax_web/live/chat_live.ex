@@ -224,6 +224,10 @@ defmodule LaxWeb.ChatLive do
     {:noreply, assign(socket, :current_user, user)}
   end
 
+  def handle_event("swiftui_launch_notification", %{ "id" => id, "replace" => replace }, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/chat/#{id}", replace: replace)}
+  end
+
   def handle_event("swiftui_register_apns" = event, params, socket) do
     {:noreply, push_event(socket, event, params)}
   end

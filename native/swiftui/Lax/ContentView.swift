@@ -5,17 +5,13 @@
 
 import SwiftUI
 import LiveViewNative
-import LiveViewNativeLiveForm
 
 struct ContentView: View {
-    @StateObject private var session = LiveSessionCoordinator(
-        .automatic(
-            development: .localhost(path: "/"),
-            // development: URL(string: "https://lax.ngrok.io")!,
-            production: URL(string: "https://lax.fly.dev")!
-        ),
-        customRegistryType: LaxRegistry.self
-    )
+    @ObservedObject var session: LiveSessionCoordinator<LaxRegistry>
+    
+    init(session: LiveSessionCoordinator<LaxRegistry>) {
+        self._session = .init(wrappedValue: session)
+    }
     
     var body: some View {
         LiveView(registry: LaxRegistry.self, session: session) {
@@ -31,10 +27,4 @@ struct ContentView: View {
         }
         .liveAPNSHandler(session: session)
     }
-}
-
-struct LaxRegistry: AggregateRegistry {
-    #Registries<
-        Addons.LiveForm<Self>
-    >
 }

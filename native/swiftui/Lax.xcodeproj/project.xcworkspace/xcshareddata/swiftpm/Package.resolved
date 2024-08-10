@@ -7,7 +7,7 @@
       "location" : "https://github.com/liveview-native/liveview-client-swiftui",
       "state" : {
         "branch" : "main",
-        "revision" : "05d1f6256449c3f53fc60fcf17bbbae870d9b02a"
+        "revision" : "1f9bd5bf61cbce49cfce45022b7f44ad8bc48bc5"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/liveview-native/liveview-native-live-form",
       "state" : {
-        "branch" : "addons-macro",
-        "revision" : "d2caa2d156bdaae6da49aeae176358c192d76892"
+        "branch" : "main",
+        "revision" : "be71b9decab800c2f7c70c2e83ab712487ce9705"
       }
     },
     {

@@ -116,6 +116,8 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
   def render(%{live_action: :chat} = assigns, _interface) do
     ~LVN"""
+    <NotificationLaunchObserver onReceive="swiftui_launch_notification" />
+
     <.header>
       Workspace
       <:actions placement="primaryAction">
@@ -250,6 +252,8 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
   def render(%{live_action: :chat_selected} = assigns, _interface) do
     ~LVN"""
+    <NotificationLaunchObserver onReceive="swiftui_launch_notification" replace />
+
     <.chat_header channel={@chat.current_channel} users_fun={&Chat.direct_message_users(@chat, &1)} />
 
     <.user_profile_sidebar
