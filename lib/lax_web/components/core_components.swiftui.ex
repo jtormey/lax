@@ -79,7 +79,7 @@ defmodule LaxWeb.CoreComponents.SwiftUI do
     default: "on",
     values: ~w(on off)
 
-  attr :rest, :global, include: ~w(disabled step)
+  attr :rest, :global, include: ~w(disabled step axis)
 
   slot :inner_block
 

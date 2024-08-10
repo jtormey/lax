@@ -69,7 +69,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     """
   end
 
-  attr :rest, :global
+  attr :rest, :global, include: ~w(selection)
   slot :inner_block, required: true
 
   def workspace_list(assigns) do
@@ -153,6 +153,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
       </LabeledContent>
     """
   end
+
   def direct_message_item(assigns) do
     ~LVN"""
     <.link {@rest}>
