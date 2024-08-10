@@ -11,6 +11,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
 
   def render(assigns, %{"target" => "macos" = target}) do
     assigns = assign(assigns, target: target)
+
     ~LVN"""
     <.header>
       Workspace

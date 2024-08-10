@@ -71,24 +71,30 @@ defmodule Lax.Messages do
       for user <- users, user.id != message.sent_by_user_id do
         for device_token <- user.apns_device_token do
           bundle_id = "com.example.Lax"
-          subtitle = case Enum.filter(users, &(&1.id != user.id and &1.id != sender.id)) do
-            [] ->
-              nil
-            users ->
-              users
-              |> Enum.reduce({"To You", length(users)}, fn
-                user, {"", l} ->
-                  {"@#{user.username}", l - 1}
-                user, {acc, 1} ->
-                  {"#{acc} & @#{user.username}", 0}
-                user, {acc, l} ->
-                  {"#{acc}, @#{user.username}", l - 1}
-              end)
-              |> elem(0)
-          end
+
+          subtitle =
+            case Enum.filter(users, &(&1.id != user.id and &1.id != sender.id)) do
+              [] ->
+                nil
+
+              users ->
+                users
+                |> Enum.reduce({"To You", length(users)}, fn
+                  user, {"", l} ->
+                    {"@#{user.username}", l - 1}
+
+                  user, {acc, 1} ->
+                    {"#{acc} & @#{user.username}", 0}
+
+                  user, {acc, l} ->
+                    {"#{acc}, @#{user.username}", l - 1}
+                end)
+                |> elem(0)
+            end
 
           Task.Supervisor.start_child(Lax.PigeonSupervisor, fn ->
-            notification = Pigeon.APNS.Notification.new("", device_token, bundle_id)
+            notification =
+              Pigeon.APNS.Notification.new("", device_token, bundle_id)
               |> Pigeon.APNS.Notification.put_custom(%{
                 "aps" => %{
                   "alert" => %{
@@ -100,6 +106,7 @@ defmodule Lax.Messages do
                 },
                 "navigate" => channel.id
               })
+
             Pigeon.APNS.push(notification)
           end)
         end

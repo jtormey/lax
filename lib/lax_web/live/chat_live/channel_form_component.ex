@@ -38,6 +38,7 @@ defmodule LaxWeb.ChatLive.ChannelFormComponent do
     case create_channel(socket.assigns.current_user, params) do
       nil ->
         {:noreply, socket}
+
       changeset ->
         {:noreply, put_form(socket, changeset)}
     end

@@ -207,8 +207,8 @@ defmodule LaxWeb.ChatLive do
     {:noreply, push_navigate(socket, to: to)}
   end
 
-  def handle_event("swiftui_select_chat", %{ "selection" => id }, socket) do
-    {:noreply, apply_chat_params(socket, %{ "id" => id })}
+  def handle_event("swiftui_select_chat", %{"selection" => id}, socket) do
+    {:noreply, apply_chat_params(socket, %{"id" => id})}
   end
 
   def handle_event("swiftui_user_detail_patch", %{"profile" => _user_id} = params, socket) do
@@ -224,7 +224,7 @@ defmodule LaxWeb.ChatLive do
     {:noreply, assign(socket, :current_user, user)}
   end
 
-  def handle_event("swiftui_launch_notification", %{ "id" => id, "replace" => replace }, socket) do
+  def handle_event("swiftui_launch_notification", %{"id" => id, "replace" => replace}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/chat/#{id}", replace: replace)}
   end
 
@@ -258,14 +258,15 @@ defmodule LaxWeb.ChatLive do
     case ChannelFormComponent.create_channel(socket.assigns.current_user, params, false) do
       nil ->
         {:noreply, socket}
+
       changeset ->
         {:noreply,
-          socket
-          |> assign(:swiftui_channel_form, to_form(%{}, as: :channel))
-          |> put_flash(
-            :error,
-            elem(Enum.into(changeset.errors, %{}).name, 0)
-          )}
+         socket
+         |> assign(:swiftui_channel_form, to_form(%{}, as: :channel))
+         |> put_flash(
+           :error,
+           elem(Enum.into(changeset.errors, %{}).name, 0)
+         )}
     end
   end
 
@@ -277,6 +278,7 @@ defmodule LaxWeb.ChatLive do
 
   def handle_info({ChannelFormComponent, {:create_channel, channel, patch?}}, socket) do
     socket = assign(socket, :modal, nil)
+
     if patch? do
       {:noreply, push_patch(socket, to: ~p"/chat/#{channel}")}
     else

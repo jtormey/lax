@@ -4,8 +4,9 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive.SwiftUI do
   import LaxWeb.UserLive.Components.SwiftUI
   import LaxWeb.ChatLive.Components.SwiftUI
 
-  def render(assigns, %{ "target" => "macos" = target }) do
+  def render(assigns, %{"target" => "macos" = target}) do
     assigns = assign(assigns, target: target)
+
     ~LVN"""
     <Group
       style={[
@@ -86,6 +87,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive.SwiftUI do
     </Group>
     """
   end
+
   def render(assigns, _interface) do
     ~LVN"""
     <Group
