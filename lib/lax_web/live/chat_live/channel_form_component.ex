@@ -34,15 +34,24 @@ defmodule LaxWeb.ChatLive.ChannelFormComponent do
     {:noreply, put_form(socket, changeset)}
   end
 
-  def handle_event("submit", %{"channel" => params}, socket) do
-    case Channels.create_and_join(socket.assigns.current_user, params) do
-      {:ok, channel} ->
-        Channels.broadcast_new_channel(socket.assigns.current_user, channel)
-        send(self(), {__MODULE__, {:create_channel, channel}})
+  def handle_event("submit", params, socket) do
+    case create_channel(socket.assigns.current_user, params) do
+      nil ->
         {:noreply, socket}
+      changeset ->
+        {:noreply, put_form(socket, changeset)}
+    end
+  end
+
+  def create_channel(current_user, %{"channel" => params}, patch? \\ true) do
+    case Channels.create_and_join(current_user, params) do
+      {:ok, channel} ->
+        Channels.broadcast_new_channel(current_user, channel)
+        send(self(), {__MODULE__, {:create_channel, channel, patch?}})
+        nil
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, put_form(socket, changeset)}
+        changeset
     end
   end
 

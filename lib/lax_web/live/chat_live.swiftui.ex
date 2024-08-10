@@ -53,7 +53,13 @@ defmodule LaxWeb.ChatLive.SwiftUI do
               unread_count={Chat.unread_count(@chat, channel)}
               target={@target}
               id={channel.id}
-            />
+            >
+              <:menu_items>
+                <Button role="destructive" phx-click="swiftui_leave_channel" phx-value-id={channel.id}>
+                  <Label systemImage="rectangle.portrait.and.arrow.right">Leave</Label>
+                </Button>
+              </:menu_items>
+            </.channel_item>
           </.workspace_section>
 
           <.workspace_section title="Direct messages">
@@ -131,8 +137,18 @@ defmodule LaxWeb.ChatLive.SwiftUI do
       </:actions>
       <:actions placement="navigation">
         <Group>
+          <Menu :if={@current_user != nil and @swiftui_tab == :home}>
+            <Image template="label" systemName="plus" />
+
+            <.button phx-click="show_manage_channels">
+              <Label systemImage="person.badge.plus">Join Channel</Label>
+            </.button>
+            <.button phx-click="show_new_channel">
+              <Label systemImage="square.and.pencil">Create Channel</Label>
+            </.button>
+          </Menu>
           <.link :if={@current_user != nil and @swiftui_tab == :direct_messages} navigate={~p"/new-direct-message"}>
-            <Image systemName="plus" />
+            <Image systemName="square.and.pencil" />
           </.link>
         </Group>
       </:actions>
@@ -148,7 +164,13 @@ defmodule LaxWeb.ChatLive.SwiftUI do
               active={Chat.has_activity?(@chat, channel)}
               unread_count={Chat.unread_count(@chat, channel)}
               navigate={~p"/chat/#{channel}"}
-            />
+            >
+              <:menu_items>
+                <Button role="destructive" phx-click="swiftui_leave_channel" phx-value-id={channel.id}>
+                  <Label systemImage="rectangle.portrait.and.arrow.right">Leave</Label>
+                </Button>
+              </:menu_items>
+            </.channel_item>
           </.workspace_section>
 
           <.workspace_section title="Direct messages">
@@ -184,6 +206,45 @@ defmodule LaxWeb.ChatLive.SwiftUI do
         </.direct_message_list>
       </.tab>
     </.tab_bar>
+
+    <VStack
+      :if={@modal == :manage_channels}
+      style={[
+        "hidden()",
+        ~s[confirmationDialog("Join Channels", isPresented: attr("isPresented"), titleVisibility: .visible, actions: :actions)]
+      ]}
+      isPresented={true}
+      phx-change="hide_modal"
+    >
+      <Group template="actions">
+        <Button
+          :for={channel <- @channels}
+          :if={not Enum.member?(@chat.channels, channel)}
+          phx-click="swiftui_join_channel"
+          phx-value-id={channel.id}
+        >
+          <%= channel.name %>
+        </Button>
+      </Group>
+    </VStack>
+
+    <VStack
+      :if={@modal == :new_channel}
+      style={[
+        "hidden()",
+        ~s[alert("Create Channel", isPresented: attr("isPresented"), actions: :actions, message: :message)]
+      ]}
+      isPresented={true}
+      phx-change="hide_modal"
+    >
+      <Group template="actions">
+        <.form for={@swiftui_channel_form} phx-change="swiftui_channel_form_validate" phx-submit="swiftui_channel_form_submit">
+          <.input field={Map.put(@swiftui_channel_form[:name], :errors, [])} label="Name" style="textInputAutocapitalization(.never); autocorrectionDisabled();" />
+          <.button type="submit">Create</.button>
+        </.form>
+        <Button role="cancel">Cancel</Button>
+      </Group>
+    </VStack>
     """
   end
 
