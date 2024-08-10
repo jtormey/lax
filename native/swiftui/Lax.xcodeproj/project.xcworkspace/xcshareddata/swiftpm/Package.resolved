@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/liveview-native/liveview-native-live-form",
       "state" : {
-        "branch" : "addons-macro",
-        "revision" : "d2caa2d156bdaae6da49aeae176358c192d76892"
+        "branch" : "main",
+        "revision" : "be71b9decab800c2f7c70c2e83ab712487ce9705"
       }
     },
     {
