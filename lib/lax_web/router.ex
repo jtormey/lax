@@ -21,6 +21,10 @@ defmodule LaxWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/", LaxWeb do
+    get "/health", HealthController, :health
+  end
+
   # Enable Swoosh mailbox preview in development
   if Application.compile_env(:lax, :dev_routes) do
     scope "/dev" do

@@ -31,6 +31,13 @@ kill_signal = 'SIGTERM'
     hard_limit = 1000
     soft_limit = 1000
 
+[[http_service.checks]]
+  method = "GET"
+  path = "/health"
+  interval = "15s"
+  grace_period = "2s"
+  timeout = "4s"
+
 [[services]]
   protocol = "tcp"
   internal_port = 8080
@@ -49,11 +56,6 @@ kill_signal = 'SIGTERM'
     type = "connections"
     hard_limit = 750
     soft_limit = 600
-
-  [[services.tcp_checks]]
-    interval = "10s"
-    timeout = "5s"
-    grace_period = "1s"
 
 [[vm]]
   memory = '1gb'
