@@ -14,7 +14,7 @@ kill_signal = 'SIGTERM'
   release_command = '/app/bin/migrate'
 
 [env]
-  PHX_HOST = 'lax.fly.dev'
+  PHX_HOST = 'lax.so'
   PORT = '8080'
   DNS_CLUSTER_QUERY = "lax.internal"
 
