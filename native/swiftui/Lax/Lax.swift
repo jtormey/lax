@@ -50,7 +50,7 @@ class AppDelegate: NSObject {
         .automatic(
             development: .localhost(path: "/"),
             // development: URL(string: "https://lax.ngrok.io")!,
-            production: URL(string: "https://lax.fly.dev")!
+            production: URL(string: "https://lax.so")!
         ),
         customRegistryType: LaxRegistry.self
     )
