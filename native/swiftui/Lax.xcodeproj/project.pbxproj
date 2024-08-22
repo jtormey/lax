@@ -38,6 +38,7 @@
 		C7CC5C1A3BF79B9860CB0579 /* ConnectingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectingView.swift; sourceTree = "<group>"; };
 		CC56C04585E8858E3FFCB5F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CCB53E4FC42FA62F3A715507 /* ReconnectingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconnectingView.swift; sourceTree = "<group>"; };
+		D0F9E0F32C779036001CEAE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D3EF9C7B3E33872CD8DE7B73 /* DisconnectedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedView.swift; sourceTree = "<group>"; };
 		E6B03B1837636ECFEA58B0CF /* Lax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5EB1880068A5095D6EDA597 /* Lax Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lax Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +69,7 @@
 		41BA576AE9B28037391C2069 /* Lax */ = {
 			isa = PBXGroup;
 			children = (
+				D0F9E0F32C779036001CEAE6 /* Info.plist */,
 				00D886812C5BC95300E6288D /* Lax.entitlements */,
 				89990F0B9466898A90283FC1 /* Preview Content */,
 				CC56C04585E8858E3FFCB5F5 /* Assets.xcassets */,
@@ -255,7 +257,7 @@
 				CODE_SIGN_ENTITLEMENTS = Lax/Lax.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 4TP757LC3E;
-				ENABLE_APP_SANDBOX = YES;
+				INFOPLIST_FILE = Lax/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Lax;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -442,7 +444,7 @@
 				CODE_SIGN_ENTITLEMENTS = Lax/Lax.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = 4TP757LC3E;
-				ENABLE_APP_SANDBOX = YES;
+				INFOPLIST_FILE = Lax/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Lax;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
