@@ -139,20 +139,31 @@ defmodule LaxWeb.ChatLive do
   end
 
   def handle_params(params, _uri, socket) do
-    {:noreply,
-     socket
-     |> assign(:swiftui_tab, swiftui_tab_from_params(params))
-     |> apply_chat_params(params)
-     |> apply_profile_params(params)
-     |> put_page_title()}
+    case apply_chat_params(socket, params) do
+      {:ok, socket} ->
+        {:noreply,
+         socket
+         |> assign(:swiftui_tab, swiftui_tab_from_params(params))
+         |> apply_profile_params(params)
+         |> put_page_title()}
+
+      {:error, socket} ->
+        {:noreply, socket}
+    end
   end
 
   def apply_chat_params(socket, %{"id" => channel_id}) do
-    update(socket, :chat, &Chat.select_channel(&1, channel_id))
+    case Chat.select_channel(socket.assigns.chat, channel_id) do
+      {:ok, chat} ->
+        {:ok, assign(socket, :chat, chat)}
+
+      {:error, :channel_not_found} ->
+        {:error, push_navigate(socket, to: ~p"/")}
+    end
   end
 
   def apply_chat_params(socket, _params) do
-    socket
+    {:ok, socket}
   end
 
   def apply_profile_params(socket, %{"profile" => user_id}) do

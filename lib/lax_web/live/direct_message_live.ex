@@ -112,23 +112,36 @@ defmodule LaxWeb.DirectMessageLive do
   end
 
   def handle_params(params, _uri, socket) do
-    {:noreply,
-     socket
-     |> apply_chat_params(params)
-     |> apply_profile_params(params)
-     |> apply_initial_user_ids_params(params)}
+    case apply_chat_params(socket, params) do
+      {:ok, socket} ->
+        {:noreply,
+         socket
+         |> apply_profile_params(params)
+         |> apply_initial_user_ids_params(params)}
+
+      {:error, socket} ->
+        {:noreply, socket}
+    end
   end
 
   def apply_chat_params(socket, %{"id" => channel_id}) do
-    socket
-    |> update(:chat, &Chat.select_channel(&1, channel_id))
-    |> put_page_title()
+    case Chat.select_channel(socket.assigns.chat, channel_id) do
+      {:ok, chat} ->
+        {:ok,
+         socket
+         |> assign(:chat, chat)
+         |> put_page_title()}
+
+      {:error, :channel_not_found} ->
+        {:error, push_navigate(socket, to: ~p"/")}
+    end
   end
 
   def apply_chat_params(socket, _params) do
-    socket
-    |> update(:chat, &Chat.select_channel(&1, nil))
-    |> assign(:page_title, "New message")
+    {:ok,
+     socket
+     |> update(:chat, &Chat.select_channel(&1, nil))
+     |> assign(:page_title, "New message")}
   end
 
   def apply_profile_params(socket, %{"profile" => user_id}) do

@@ -25,6 +25,9 @@ defmodule Lax.Users.Membership do
       from c in Channel,
         join: cu in ChannelUser,
         on: [channel_id: c.id, user_id: ^user.id],
+        where:
+          c.type != :direct_message or
+            c.id in subquery(ChannelUser.channels_with_other_users_query(user)),
         order_by: [desc_nulls_last: cu.last_viewed_at, asc: c.name],
         limit: 1
 
@@ -56,7 +59,9 @@ defmodule Lax.Users.Membership do
           order_by(query, [c], asc: c.name)
 
         :direct_message ->
-          order_by(query, [c], desc: c.inserted_at)
+          query
+          |> where([c], c.id in subquery(ChannelUser.channels_with_other_users_query(user)))
+          |> order_by([c], desc: c.inserted_at)
       end
 
     Repo.all(query)

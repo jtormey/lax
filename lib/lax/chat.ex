@@ -71,12 +71,13 @@ defmodule Lax.Chat do
     end
 
     if channel = Enum.find(chat.channels ++ chat.direct_messages, &(&1.id == channel_id)) do
-      chat
-      |> Map.put(:current_channel, channel)
-      |> put_messages()
-      |> put_unread_counts()
+      {:ok,
+       chat
+       |> Map.put(:current_channel, channel)
+       |> put_messages()
+       |> put_unread_counts()}
     else
-      raise "Tried to join a channel that is not preloaded"
+      {:error, :channel_not_found}
     end
   end
 
