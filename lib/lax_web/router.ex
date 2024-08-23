@@ -63,6 +63,8 @@ defmodule LaxWeb.Router do
   scope "/", LaxWeb do
     pipe_through [:browser]
 
+    get "/support", PageController, :support
+
     get "/users/sign-out", UserSessionController, :delete
     delete "/users/sign-out", UserSessionController, :delete
 
