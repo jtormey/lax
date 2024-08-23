@@ -6,7 +6,7 @@ defmodule LaxWeb.UserLive.Components do
   def username(assigns) do
     ~H"""
     <span class="text-sm text-white font-bold">
-      <%= @user.username %>
+      <%= Lax.Users.User.display_name(@user) %>
     </span>
     """
   end

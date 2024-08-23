@@ -29,7 +29,10 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           <:option :if={length(@current_user.apns_device_token) > 0} on_click="swiftui_unregister_apns" system_image="bell.badge.slash">
             Disable notifications
           </:option>
-          <Text><%= @current_user.username %></Text>
+          <:option on_click="delete_user" system_image="person.fill.xmark" role={:destructive}>
+            Delete account
+          </:option>
+          <Text><%= Lax.Users.User.display_name(@current_user) %></Text>
         </.user_options>
       </:actions>
       <:actions placement="automatic">
@@ -134,6 +137,9 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           </:option>
           <:option :if={length(@current_user.apns_device_token) > 0} on_click="swiftui_unregister_apns" system_image="bell.badge.slash">
             Disable notifications
+          </:option>
+          <:option on_click="delete_user" system_image="person.fill.xmark" role={:destructive}>
+            Delete account
           </:option>
           <.user_profile :if={@current_user} user={@current_user} size={:md} online />
         </.user_options>

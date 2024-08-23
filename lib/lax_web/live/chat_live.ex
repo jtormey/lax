@@ -197,6 +197,11 @@ defmodule LaxWeb.ChatLive do
     {:noreply, update(socket, :chat, &Chat.delete_message(&1, message_id))}
   end
 
+  def handle_event("delete_user", _params, socket) do
+    Users.delete_user(socket.assigns.current_user)
+    {:noreply, push_navigate(socket, to: ~p"/users/sign-in")}
+  end
+
   ## SwiftUI
 
   def handle_event("swiftui_tab_selection", %{"selection" => selection}, socket) do

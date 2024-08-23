@@ -4,7 +4,7 @@ defmodule LaxWeb.DirectMessageLive do
   alias Lax.Chat
   alias Lax.Messages.Message
   alias Lax.Users
-  alias LaxWeb.DirectMessageLive.NewDirectMessageComponent
+  alias LaxWeb.DirectMessageLive.NewDirectMessageLive
 
   import LaxWeb.ChatLive.Components
   import LaxWeb.DirectMessageLive.Components
@@ -63,7 +63,7 @@ defmodule LaxWeb.DirectMessageLive do
     ~H"""
     <%= live_render(
       @socket,
-      __MODULE__.NewDirectMessageLive,
+      NewDirectMessageLive,
       id: "new_direct_message",
       session: %{
         "initial_user_ids" => @initial_user_ids
@@ -169,7 +169,7 @@ defmodule LaxWeb.DirectMessageLive do
     {:noreply, update(socket, :chat, &Chat.delete_message(&1, message_id))}
   end
 
-  def handle_info({NewDirectMessageComponent, {:create_direct_message, channel}}, socket) do
+  def handle_info({NewDirectMessageLive, {:create_direct_message, channel}}, socket) do
     {:noreply,
      socket
      |> assign(:modal, nil)

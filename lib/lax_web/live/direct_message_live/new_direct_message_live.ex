@@ -117,12 +117,18 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive do
   def handle_event("submit", %{"chat" => params}, socket) do
     case Ecto.Changeset.apply_action(changeset(socket, params), :submit) do
       {:ok, %{text: text, user_ids: user_ids}} ->
+        users = Users.get_all(user_ids)
+
+        if users == [] do
+          raise("Cannot create direct message with no other users")
+        end
+
         {:ok, channel} =
           Channels.create_and_join(
             socket.assigns.current_user,
             %{},
             type: :direct_message,
-            invite_user_ids: user_ids
+            invite_users: users
           )
 
         user_ids = [socket.assigns.current_user | user_ids]

@@ -31,7 +31,7 @@ defmodule LaxWeb.DirectMessageLive.Components.SwiftUI do
         <VStack alignment="leading">
           <HStack style="padding(.bottom, 1);">
             <Text style="font(.headline);">
-              <%= Enum.map_join(@users, ", ", & &1.username) %>
+              <%= Enum.map_join(@users, ", ", &Lax.Users.User.display_name/1) %>
             </Text>
             <Spacer />
             <Text style="font(.footnote);">
@@ -39,7 +39,7 @@ defmodule LaxWeb.DirectMessageLive.Components.SwiftUI do
             </Text>
           </HStack>
           <Text style="font(.subheadline);">
-            <%= @latest_message.sent_by_user.username%>: <%= @latest_message.text %>
+            <%= Lax.Users.User.display_name(@latest_message.sent_by_user) %>: <%= @latest_message.text %>
           </Text>
         </VStack>
       </HStack>

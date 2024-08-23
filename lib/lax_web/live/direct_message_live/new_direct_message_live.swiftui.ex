@@ -38,7 +38,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive.SwiftUI do
               online={LaxWeb.Presence.Live.online?(assigns, user)}
               size={:md}
             />
-            <Text><%= user.username %></Text>
+            <.username user={user} />
             <Spacer />
             <Image systemName="plus" style="foregroundStyle(.tint);" />
           </HStack>
@@ -75,7 +75,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive.SwiftUI do
                   online={LaxWeb.Presence.Live.online?(assigns, user)}
                   size={:xs}
                 />
-                <Text><%= user.username %></Text>
+                <.username user={user} />
                 <Spacer />
                 <Image systemName="xmark" style="foregroundStyle(.tint);" />
               </HStack>
@@ -119,7 +119,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive.SwiftUI do
               online={LaxWeb.Presence.Live.online?(assigns, user)}
               size={:md}
             />
-            <Text><%= user.username %></Text>
+            <.username user={user} />
             <Spacer />
             <Image systemName="plus" style="foregroundStyle(.tint);" />
           </HStack>
@@ -155,7 +155,7 @@ defmodule LaxWeb.DirectMessageLive.NewDirectMessageLive.SwiftUI do
                   online={LaxWeb.Presence.Live.online?(assigns, user)}
                   size={:xs}
                 />
-                <Text><%= user.username %></Text>
+                <.username user={user} />
                 <Spacer />
                 <Image systemName="xmark" style="foregroundStyle(.tint);" />
               </HStack>

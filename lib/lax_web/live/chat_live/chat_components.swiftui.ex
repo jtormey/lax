@@ -39,6 +39,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
     attr :navigate, :string
     attr :on_click, :string
     attr :system_image, :string
+    attr :role, :atom, values: [:destructive]
   end
 
   slot :inner_block, required: true
@@ -58,7 +59,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
             </Label>
           </.link>
         <% on_click = option[:on_click] -> %>
-          <.button phx-click={on_click}>
+          <.button phx-click={on_click} role={option[:role]}>
             <Label systemImage={option[:system_image]}>
               <%= render_slot(option) %>
             </Label>
@@ -147,7 +148,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         <HStack template="label">
           <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
           <Text>
-            <%= Enum.map_join(@users, ", ", & &1.username) %>
+            <%= Enum.map_join(@users, ", ", &Lax.Users.User.display_name/1) %>
           </Text>
         </HStack>
       </LabeledContent>
@@ -161,7 +162,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         <HStack template="label">
           <.user_profile user={hd(@users)} online={@online_fun.(hd(@users))} size={:xs} />
           <Text>
-            <%= Enum.map_join(@users, ", ", & &1.username) %>
+            <%= Enum.map_join(@users, ", ", &Lax.Users.User.display_name/1) %>
           </Text>
         </HStack>
       </LabeledContent>
@@ -183,7 +184,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   def chat_header(%{channel: %{type: :direct_message}} = assigns) do
     ~LVN"""
     <.header>
-      @<%= Enum.map_join(@users_fun.(@channel), ", ", & &1.username) %>
+      @<%= Enum.map_join(@users_fun.(@channel), ", ", &Lax.Users.User.display_name/1) %>
     </.header>
     """
   end
@@ -285,7 +286,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
           <HStack>
             <Button style="buttonStyle(.plain);" phx-click="swiftui_user_detail_patch" phx-value-profile={@user_detail_patch}>
               <Text style="font(.headline); foregroundStyle(.primary);">
-                <%= @user.username %>
+                <%= Lax.Users.User.display_name(@user) %>
               </Text>
             </Button>
             <Spacer />
@@ -402,7 +403,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
           style="padding();"
         >
           <.user_profile user={@user} online={@online_fun.(@user)} size={:xl} />
-          <Text style="font(.title2); bold();"><%= @user.username %></Text>
+          <Text style="font(.title2); bold();"><%= Lax.Users.User.display_name(@user) %></Text>
 
           <LabeledContent>
             <Text template="label">Status</Text>
@@ -417,7 +418,7 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
           </LabeledContent>
 
           <.link
-            :if={@current_user}
+            :if={@current_user && @user.deleted_at == nil}
             navigate={~p"/new-direct-message?to_user=#{@user}"}
             style='buttonStyle(.borderedProminent); controlSize(.large); padding(.vertical);'
           >

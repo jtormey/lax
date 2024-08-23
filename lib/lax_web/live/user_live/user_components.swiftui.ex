@@ -2,6 +2,16 @@ defmodule LaxWeb.UserLive.Components.SwiftUI do
   use LiveViewNative.Component
 
   attr :user, Lax.Users.User, required: true
+
+  def username(assigns) do
+    ~LVN"""
+    <Text>
+      <%= Lax.Users.User.display_name(@user) %>
+    </Text>
+    """
+  end
+
+  attr :user, Lax.Users.User, required: true
   attr :size, :atom, values: [:xs, :md, :xl]
   attr :online, :boolean, default: nil
 

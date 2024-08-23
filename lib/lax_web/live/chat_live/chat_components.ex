@@ -134,7 +134,7 @@ defmodule LaxWeb.ChatLive.Components do
           Timezone: <%= @user.time_zone %> (<%= local_time_strftime %> local)
         </span>
       </div>
-      <div class="mt-8">
+      <div :if={@user.deleted_at == nil} class="mt-8">
         <.button variant={:action} phx-click={JS.navigate(~p"/direct-messages?to_user=#{@user}")}>
           Direct message
         </.button>
@@ -178,7 +178,7 @@ defmodule LaxWeb.ChatLive.Components do
         <.intersperse :let={user} enum={@users}>
           <:separator><span class="text-zinc-400">,</span></:separator>
           <span class={["text-sm truncate", @text_class]}>
-            <%= user.username %>
+            <%= Lax.Users.User.display_name(user) %>
           </span>
         </.intersperse>
       </div>
@@ -242,7 +242,7 @@ defmodule LaxWeb.ChatLive.Components do
           <div class="py-4">
             <.intersperse :let={user} enum={@users_fun.(@channel)}>
               <:separator><span class="text-zinc-400">,</span></:separator>
-              <%= user.username %>
+              <%= Lax.Users.User.display_name(user) %>
             </.intersperse>
           </div>
         </div>
@@ -364,7 +364,7 @@ defmodule LaxWeb.ChatLive.Components do
           "##{channel.name}"
 
         %{type: :direct_message} = channel ->
-          "#{Enum.map_join(Chat.direct_message_users(chat, channel), ", ", &"@#{&1.username}")}"
+          "#{Enum.map_join(Chat.direct_message_users(chat, channel), ", ", &"@#{Lax.Users.User.display_name(&1)}")}"
       end
 
     assign(socket, :page_title, page_title)

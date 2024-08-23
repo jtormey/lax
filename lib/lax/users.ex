@@ -25,7 +25,7 @@ defmodule Lax.Users do
 
   """
   def get_user_by_email(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+    Repo.get_by(User.active_query(), email: email)
   end
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Lax.Users do
   """
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
-    user = Repo.get_by(User, email: email)
+    user = Repo.get_by(User.active_query(), email: email)
     if User.valid_password?(user, password), do: user
   end
 
@@ -63,12 +63,12 @@ defmodule Lax.Users do
   def get_user!(id), do: Repo.get!(User, id)
 
   def get_all(ids) do
-    Repo.all(from u in User, where: u.id in ^ids)
+    Repo.all(from u in User.active_query(), where: u.id in ^ids)
   end
 
   def list_other_users(user) do
     Repo.all(
-      from u in User,
+      from u in User.active_query(),
         where: u.id != ^user.id,
         order_by: [asc: u.username]
     )
@@ -383,5 +383,14 @@ defmodule Lax.Users do
     user
     |> User.apns_device_token_changeset(%{apns_device_token: attrs})
     |> Repo.update()
+  end
+
+  @doc """
+  Deletes a user by anonymizing their account and deleting all sessions. Preserves messages sent.
+  """
+  def delete_user(user) do
+    Ecto.Multi.new()
+    |> User.delete_user_multi(user)
+    |> Repo.transaction()
   end
 end

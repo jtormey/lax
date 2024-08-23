@@ -1,6 +1,9 @@
 defmodule Lax.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
+
+  alias Lax.Users.UserToken
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -13,6 +16,7 @@ defmodule Lax.Users.User do
     field :time_zone, :string, default: "America/New_York"
     field :display_color, :string
     field :confirmed_at, :naive_datetime
+    field :deleted_at, :naive_datetime
     field :apns_device_token, {:array, :string}, default: []
 
     embeds_one :ui_settings, UiSettings, on_replace: :update, primary_key: false do
@@ -188,6 +192,24 @@ defmodule Lax.Users.User do
     |> cast(attrs, [:apns_device_token])
   end
 
+  def delete_changeset(user) do
+    system_time = :os.system_time()
+
+    user
+    |> change(
+      email: "deleted+#{system_time}@lax.so",
+      username: "deleted_#{system_time}",
+      password: Base.encode64(:crypto.strong_rand_bytes(16)),
+      time_zone: "America/New_York",
+      display_color: "#71717a",
+      ui_settings: nil,
+      apns_device_token: [],
+      confirmed_at: nil,
+      deleted_at: NaiveDateTime.utc_now(:second)
+    )
+    |> maybe_hash_password(hash_password: true)
+  end
+
   @doc """
   Verifies the password.
 
@@ -213,5 +235,25 @@ defmodule Lax.Users.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  ## Queries
+
+  def active_query(query \\ __MODULE__) do
+    where(query, [u], is_nil(u.deleted_at))
+  end
+
+  ## Multis
+
+  def delete_user_multi(multi, user) do
+    multi
+    |> Ecto.Multi.update(:user, delete_changeset(user))
+    |> Ecto.Multi.delete_all(:user_tokens, UserToken.by_user_and_contexts_query(user, :all))
+  end
+
+  ## View
+
+  def display_name(user) do
+    if user.deleted_at, do: "Deleted User", else: user.username
   end
 end

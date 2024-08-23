@@ -58,7 +58,7 @@ defmodule LaxWeb.DirectMessageLive.Components do
                 </span>
               </div>
               <span class="text-sm text-zinc-400 line-clamp-2 break-all">
-                <%= @latest_message.sent_by_user.username %>: <%= @latest_message.text %>
+                <%= Lax.Users.User.display_name(@latest_message.sent_by_user) %>: <%= @latest_message.text %>
               </span>
             </div>
           </div>

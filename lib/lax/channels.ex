@@ -1,7 +1,6 @@
 defmodule Lax.Channels do
   import Ecto.Query, warn: false
 
-  alias Lax.Users
   alias Lax.Repo
   alias Lax.Channels.Channel
   alias Lax.Users.Membership
@@ -35,8 +34,7 @@ defmodule Lax.Channels do
           Membership.join_channel!(user, channel)
 
           opts
-          |> Keyword.get(:invite_user_ids, [])
-          |> Users.get_all()
+          |> Keyword.get(:invite_users, [])
           |> Enum.each(&Membership.join_channel!(&1, channel))
 
           channel
