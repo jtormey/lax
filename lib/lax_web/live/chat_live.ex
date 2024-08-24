@@ -74,6 +74,7 @@ defmodule LaxWeb.ChatLive do
             @current_user && @current_user.id == message.sent_by_user_id &&
               JS.push("delete_message", value: %{id: message.id})
           }
+          on_report={JS.push("report_message", value: %{id: message.id})}
         />
       </.chat>
 
@@ -206,6 +207,18 @@ defmodule LaxWeb.ChatLive do
 
   def handle_event("delete_message", %{"id" => message_id}, socket) do
     {:noreply, update(socket, :chat, &Chat.delete_message(&1, message_id))}
+  end
+
+  def handle_event("report_message", %{"id" => _message_id}, socket) do
+    Process.sleep(500)
+
+    # TODO: Handle reported messages so that they may be removed by an admin
+    message =
+      """
+      Message has been reported as abusive or insensitive, an admin will review the message and remove it if it meets the criteria for removal.
+      """
+
+    {:noreply, put_flash(socket, :info, message)}
   end
 
   def handle_event("delete_user", _params, socket) do

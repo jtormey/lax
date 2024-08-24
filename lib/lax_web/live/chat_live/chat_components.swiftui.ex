@@ -237,22 +237,15 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   attr :time, :string, required: true
   attr :text, :string, required: true
   attr :compact, :boolean, required: true
-  attr :on_delete, JS, default: nil
+  attr :on_delete, :string, default: nil
+  attr :on_report, :string, default: nil
 
   def message(%{compact: true} = assigns) do
     ~LVN"""
     <Group style='padding(.horizontal, 56); padding(.bottom, 1); contextMenu(menuItems: :delete_menu);'>
-      <Button
-        :if={@on_delete}
-        role="destructive"
-        template={:delete_menu}
-        phx-click={@on_delete}
-        phx-value-id={@message_id}
-      >
-        <Label systemImage="trash">
-          Delete message
-        </Label>
-      </Button>
+      <Group template={:delete_menu}>
+        <.message_hold_actions message_id={@message_id} on_delete={@on_delete} on_report={@on_report} />
+      </Group>
       <HStack style='frame(maxWidth: :infinity);'>
         <VStack alignment="leading">
           <Text markdown={@text} style="textSelection(.enabled);" />
@@ -266,17 +259,9 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
   def message(assigns) do
     ~LVN"""
     <Group style="padding(.horizontal); padding(.bottom, 1); contextMenu(menuItems: :delete_menu);">
-      <Button
-        :if={@on_delete}
-        role="destructive"
-        template={:delete_menu}
-        phx-click={@on_delete}
-        phx-value-id={@message_id}
-      >
-        <Label systemImage="trash">
-          Delete message
-        </Label>
-      </Button>
+      <Group template={:delete_menu}>
+        <.message_hold_actions message_id={@message_id} on_delete={@on_delete} on_report={@on_report} />
+      </Group>
       <HStack style='frame(maxWidth: .infinity);'>
         <VStack style='padding(.top, 2)'>
           <.user_profile user={@user} size={:md} online={@online} />
@@ -299,6 +284,35 @@ defmodule LaxWeb.ChatLive.Components.SwiftUI do
         <Spacer />
       </HStack>
     </Group>
+    """
+  end
+
+  attr :message_id, :string, required: true
+  attr :on_delete, :string, default: nil
+  attr :on_report, :string, default: nil
+
+  def message_hold_actions(assigns) do
+    ~LVN"""
+    <Button
+      :if={@on_delete}
+      role="destructive"
+      phx-click={@on_delete}
+      phx-value-id={@message_id}
+    >
+      <Label systemImage="trash">
+        Delete message
+      </Label>
+    </Button>
+    <Button
+      :if={@on_report}
+      role="destructive"
+      phx-click={@on_report}
+      phx-value-id={@message_id}
+    >
+      <Label systemImage="flag">
+        Report message
+      </Label>
+    </Button>
     """
   end
 

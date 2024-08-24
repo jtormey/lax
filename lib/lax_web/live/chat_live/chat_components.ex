@@ -268,6 +268,7 @@ defmodule LaxWeb.ChatLive.Components do
   attr :text, :string, required: true
   attr :compact, :boolean, required: true
   attr :on_delete, JS, default: nil
+  attr :on_report, JS, default: nil
 
   def message(%{compact: true} = assigns) do
     ~H"""
@@ -280,9 +281,7 @@ defmodule LaxWeb.ChatLive.Components do
       <div class="flex-1 overflow-x-hidden">
         <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @text %></p>
       </div>
-      <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
-        <.icon_button icon="hero-trash" phx-click={@on_delete} />
-      </div>
+      <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
     </div>
     """
   end
@@ -304,9 +303,22 @@ defmodule LaxWeb.ChatLive.Components do
           <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @text %></p>
         </div>
       </div>
-      <div :if={@on_delete} class="absolute top-1 right-4 hidden group-hover:block">
-        <.icon_button icon="hero-trash" phx-click={@on_delete} />
-      </div>
+      <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
+    </div>
+    """
+  end
+
+  attr :on_delete, JS, default: nil
+  attr :on_report, JS, default: nil
+
+  def message_hover_actions(assigns) do
+    ~H"""
+    <div
+      :if={@on_delete || @on_report}
+      class="absolute top-1 right-4 hidden group-hover:flex gap-1 items-center"
+    >
+      <.icon_button icon="hero-trash" phx-click={@on_delete} title="Delete message" />
+      <.icon_button icon="hero-flag" phx-click={@on_report} title="Report abuse" />
     </div>
     """
   end

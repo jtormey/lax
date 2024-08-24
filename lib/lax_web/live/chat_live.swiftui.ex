@@ -99,6 +99,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
               text={message.text}
               compact={message.compact}
               on_delete={@current_user && @current_user.id == message.sent_by_user_id && "delete_message"}
+              on_report="report_message"
             />
             <:bottom_bar>
               <.chat_form
@@ -279,6 +280,7 @@ defmodule LaxWeb.ChatLive.SwiftUI do
           text={message.text}
           compact={message.compact}
           on_delete={@current_user && @current_user.id == message.sent_by_user_id && "delete_message"}
+          on_report="report_message"
         />
         <:bottom_bar>
           <.chat_form
