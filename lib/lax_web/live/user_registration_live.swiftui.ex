@@ -30,6 +30,12 @@ defmodule LaxWeb.UserRegistrationLive.SwiftUI do
       <.input field={@form[:password]} type="SecureField" label="Password" />
       <.input field={@form[:time_zone]} type="Picker" label="Time Zone" options={time_zone_options()} />
 
+      <.input
+        field={@form[:terms_of_service]}
+        type="Toggle"
+        label={~LVN|<.link href="https://github.com/jtormey/lax/blob/main/native/swiftui/TERMS.md">I agree to the Terms of Service</.link>|}
+      />
+
       <:actions>
         <.button type="submit">
           Create an account

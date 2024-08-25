@@ -27,6 +27,8 @@ defmodule Lax.Users.User do
 
     many_to_many :channels, Lax.Channels.Channel, join_through: Lax.Channels.ChannelUser
 
+    field :terms_of_service, :boolean, virtual: true
+
     timestamps(type: :utc_datetime)
   end
 
@@ -55,11 +57,12 @@ defmodule Lax.Users.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :username, :password, :time_zone])
+    |> cast(attrs, [:email, :username, :password, :time_zone, :terms_of_service])
     |> validate_email(opts)
     |> validate_username(opts)
     |> validate_password(opts)
     |> validate_time_zone()
+    |> validate_acceptance(:terms_of_service, message: "please agree to the terms of service")
   end
 
   defp validate_email(changeset, opts) do

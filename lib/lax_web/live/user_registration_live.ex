@@ -36,6 +36,15 @@ defmodule LaxWeb.UserRegistrationLive do
         <.input field={@form[:username]} label="Username" required />
         <.input field={@form[:password]} type="password" label="Password" required />
 
+        <.input
+          field={@form[:terms_of_service]}
+          type="checkbox"
+          label={
+            ~H|<span>I agree to the <.link href="https://github.com/jtormey/lax/blob/main/native/swiftui/TERMS.md" target="_blank" class="underline">Terms of Service</.link></span>|
+          }
+          required
+        />
+
         <input
           type="hidden"
           id={@form[:time_zone].id}
