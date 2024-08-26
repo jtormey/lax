@@ -66,11 +66,14 @@ defmodule LaxWeb.ChatLive.Components do
   end
 
   slot :inner_block, required: true
+  slot :bottom, default: []
 
   def sidebar(assigns) do
     ~H"""
-    <div class="flex-1 overflow-y-scroll no-scrollbar py-4 px-2">
+    <div class="flex-1 flex flex-col overflow-y-scroll no-scrollbar py-4 px-2">
       <%= render_slot(@inner_block) %>
+      <div class="flex-1" />
+      <%= render_slot(@bottom) %>
     </div>
     """
   end
@@ -359,6 +362,27 @@ defmodule LaxWeb.ChatLive.Components do
     >
       <.icon name="hero-paper-airplane-solid" class="size-4 text-white group-disabled:text-zinc-500" />
     </button>
+    """
+  end
+
+  def app_store_cta(assigns) do
+    ~H"""
+    <div class="bg-zinc-800 border border-zinc-600 rounded-lg mx-1 p-2 text-white">
+      <h3 class="mb-1 text-sm text-zinc-100 font-semibold">
+        Try Lax for iOS!
+      </h3>
+      <p class="mb-3 text-xs text-zinc-400">
+        Lax now has an iOS app built with LiveView Native. Scan to install:
+      </p>
+      <div class="size-32 relative overflow-hidden rounded">
+        <div class="pt-[100%]" />
+        <div class="absolute -inset-2">
+          <.link href="https://apps.apple.com/app/lax-community-chat/id6654924329" target="_blank">
+            <img src={~p"/images/lax-app-store-qr.png"} class="w-full h-full" />
+          </.link>
+        </div>
+      </div>
+    </div>
     """
   end
 

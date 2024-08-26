@@ -56,6 +56,10 @@ defmodule LaxWeb.ChatLive do
           <.notice :if={!@current_user}>
             Sign in to use the direct messaging feature.
           </.notice>
+
+          <:bottom>
+            <.app_store_cta />
+          </:bottom>
         </.sidebar>
       </:sidebar>
 
