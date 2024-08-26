@@ -367,7 +367,7 @@ defmodule LaxWeb.ChatLive.Components do
 
   def app_store_cta(assigns) do
     ~H"""
-    <div class="bg-zinc-800 border border-zinc-600 rounded p-2 text-white">
+    <div class="bg-zinc-800 border border-zinc-600 rounded p-2 text-white max-w-[300px] min-w-[150px]">
       <h3 class="mb-1 text-sm text-zinc-100 font-semibold">
         Try Lax for iOS!
       </h3>
