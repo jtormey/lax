@@ -72,7 +72,7 @@ defmodule LaxWeb.ChatLive.Components do
     ~H"""
     <div class="flex-1 flex flex-col overflow-y-scroll no-scrollbar py-4 px-2">
       <%= render_slot(@inner_block) %>
-      <div class="flex-1" />
+      <div class="flex-1 mb-4" />
       <%= render_slot(@bottom) %>
     </div>
     """
@@ -367,14 +367,14 @@ defmodule LaxWeb.ChatLive.Components do
 
   def app_store_cta(assigns) do
     ~H"""
-    <div class="bg-zinc-800 border border-zinc-600 rounded-lg mx-1 p-2 text-white">
+    <div class="bg-zinc-800 border border-zinc-600 rounded p-2 text-white">
       <h3 class="mb-1 text-sm text-zinc-100 font-semibold">
         Try Lax for iOS!
       </h3>
       <p class="mb-3 text-xs text-zinc-400">
         Lax now has an iOS app built with LiveView Native. Scan to install:
       </p>
-      <div class="size-32 relative overflow-hidden rounded">
+      <div class="size-32 relative overflow-hidden rounded-sm">
         <div class="pt-[100%]" />
         <div class="absolute -inset-2">
           <.link href="https://apps.apple.com/app/lax-community-chat/id6654924329" target="_blank">
