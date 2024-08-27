@@ -285,7 +285,7 @@ defmodule LaxWeb.ChatLive.Components do
         </div>
         <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
       </div>
-      <.message_link_previews :if={@message.link_previews != []} message={@message} />
+      <.message_link_previews :if={show_link_previews?(@message)} message={@message} />
     </div>
     """
   end
@@ -310,7 +310,7 @@ defmodule LaxWeb.ChatLive.Components do
         </div>
         <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
       </div>
-      <.message_link_previews :if={@message.link_previews != []} message={@message} />
+      <.message_link_previews :if={show_link_previews?(@message)} message={@message} />
     </div>
     """
   end
@@ -337,6 +337,7 @@ defmodule LaxWeb.ChatLive.Components do
     <div class="ml-10 mt-2 space-y-2">
       <.message_link_preview
         :for={link_preview <- @message.link_previews}
+        :if={show_link_preview?(link_preview)}
         link_preview={link_preview}
       />
     </div>
@@ -352,7 +353,7 @@ defmodule LaxWeb.ChatLive.Components do
         <p class="text-sm text-zinc-200 font-semibold">
           <%= @link_preview.page_title %>
         </p>
-        <p class="text-xs text-zinc-400">
+        <p :if={@link_preview.page_description} class="text-xs text-zinc-400">
           <%= @link_preview.page_description %>
         </p>
         <img
@@ -363,6 +364,14 @@ defmodule LaxWeb.ChatLive.Components do
       </.link>
     </div>
     """
+  end
+
+  defp show_link_previews?(message) do
+    message.link_previews != [] and Enum.any?(message.link_previews, &show_link_preview?/1)
+  end
+
+  defp show_link_preview?(link_preview) do
+    link_preview.state == :done and link_preview.page_title != nil
   end
 
   defp linkify_text(text) do

@@ -199,7 +199,7 @@ defmodule LaxWeb.DirectMessageLive do
     {:noreply, update(socket, :chat, &Chat.receive_deleted_message(&1, channel_message_ids))}
   end
 
-  def handle_info({:link_preview, :updated, link_preview}, socket) do
+  def handle_info({:link_preview, _tag, link_preview}, socket) do
     {:noreply, update(socket, :chat, &Chat.receive_link_preview(&1, link_preview))}
   end
 
