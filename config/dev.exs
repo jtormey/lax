@@ -92,7 +92,7 @@ config :live_view_native_stylesheet,
 
 # config :pigeon, :apns,
 #   apns_default: %{
-#     cert: "secret/apns/cert.pem",
-#     key: "secret/apns/key_unencrypted.pem",
+#     cert: "secret/apns_laxso/cert.pem",
+#     key: "secret/apns_laxso/key_unencrypted.pem",
 #     mode: :dev
 #   }

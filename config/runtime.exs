@@ -67,8 +67,8 @@ if config_env() == :prod do
 
   config :pigeon, :apns,
     apns_default: %{
-      cert: File.read!("/app/secret/apns/cert.pem"),
-      key: File.read!("/app/secret/apns/key_unencrypted.pem"),
+      cert: File.read!("/app/secret/apns_laxso/cert.pem"),
+      key: File.read!("/app/secret/apns_laxso/key_unencrypted.pem"),
       mode: :prod
     }
 
