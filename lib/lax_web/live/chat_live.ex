@@ -68,12 +68,10 @@ defmodule LaxWeb.ChatLive do
       <.chat>
         <.message
           :for={message <- group_messages(@chat.messages)}
-          user={message.sent_by_user}
+          message={message}
           user_detail_patch={~p"/chat/#{@chat.current_channel}?profile=#{message.sent_by_user}"}
           online={LaxWeb.Presence.Live.online?(assigns, message.sent_by_user)}
           time={Message.show_time(message, @current_user && @current_user.time_zone)}
-          text={message.text}
-          compact={message.compact}
           on_delete={
             @current_user && @current_user.id == message.sent_by_user_id &&
               JS.push("delete_message", value: %{id: message.id})

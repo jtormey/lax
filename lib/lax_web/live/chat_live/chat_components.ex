@@ -264,16 +264,14 @@ defmodule LaxWeb.ChatLive.Components do
     """
   end
 
-  attr :user, Lax.Users.User, required: true
+  attr :message, Lax.Messages.Message, required: true
   attr :user_detail_patch, :string
   attr :online, :boolean, required: true
   attr :time, :string, required: true
-  attr :text, :string, required: true
-  attr :compact, :boolean, required: true
   attr :on_delete, JS, default: nil
   attr :on_report, JS, default: nil
 
-  def message(%{compact: true} = assigns) do
+  def message(%{message: %{compact: true}} = assigns) do
     ~H"""
     <div class="relative flex gap-2 hover:bg-zinc-800 px-4 py-1 group">
       <div class="w-8 flex items-start justify-end pt-0.5 invisible group-hover:visible">
@@ -282,7 +280,7 @@ defmodule LaxWeb.ChatLive.Components do
         </span>
       </div>
       <div class="flex-1 overflow-x-hidden">
-        <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @text %></p>
+        <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @message.text %></p>
       </div>
       <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
     </div>
@@ -292,18 +290,18 @@ defmodule LaxWeb.ChatLive.Components do
   def message(assigns) do
     ~H"""
     <div class="relative flex gap-2 hover:bg-zinc-800 px-4 pt-2 pb-1 group">
-      <.user_profile user={@user} size={:md} class="mt-1" online={@online} />
+      <.user_profile user={@message.sent_by_user} size={:md} class="mt-1" online={@online} />
       <div class="flex-1">
         <div class="space-x-1 leading-none">
           <.link patch={@user_detail_patch}>
-            <.username user={@user} />
+            <.username user={@message.sent_by_user} />
           </.link>
           <span class="text-xs text-zinc-400">
             <%= @time %>
           </span>
         </div>
         <div class="flex-1 overflow-x-hidden">
-          <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @text %></p>
+          <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @message.text %></p>
         </div>
       </div>
       <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
