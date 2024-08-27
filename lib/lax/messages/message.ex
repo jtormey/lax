@@ -11,6 +11,8 @@ defmodule Lax.Messages.Message do
     belongs_to :channel, Lax.Channels.Channel
     belongs_to :sent_by_user, Lax.Users.User
 
+    has_many :link_previews, Lax.Messages.LinkPreview, foreign_key: :resource_id
+
     field :compact, :boolean, default: false, virtual: true
 
     timestamps(type: :naive_datetime_usec)

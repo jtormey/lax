@@ -24,6 +24,7 @@ defmodule Lax.Messages.LinkPreview do
     |> cast(attrs, [:link, :resource_id])
     |> validate_required([:link, :resource_id])
     |> put_change(:state, :loading)
+    |> unique_constraint(:link, name: :link_previews_pkey)
   end
 
   def loaded_changeset(link_preview, attrs) do

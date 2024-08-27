@@ -273,38 +273,44 @@ defmodule LaxWeb.ChatLive.Components do
 
   def message(%{message: %{compact: true}} = assigns) do
     ~H"""
-    <div class="relative flex gap-2 hover:bg-zinc-800 px-4 py-1 group">
-      <div class="w-8 flex items-start justify-end pt-0.5 invisible group-hover:visible">
-        <span class="text-xs text-zinc-400">
-          <%= @time %>
-        </span>
+    <div class="relative hover:bg-zinc-800 px-4 py-1 group">
+      <div class="flex gap-2">
+        <div class="w-8 flex items-start justify-end pt-0.5 invisible group-hover:visible">
+          <span class="text-xs text-zinc-400">
+            <%= @time %>
+          </span>
+        </div>
+        <div class="flex-1 overflow-x-hidden">
+          <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words" phx-no-format><%= linkify_text(@message.text) %></p>
+        </div>
+        <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
       </div>
-      <div class="flex-1 overflow-x-hidden">
-        <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @message.text %></p>
-      </div>
-      <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
+      <.message_link_previews :if={@message.link_previews != []} message={@message} />
     </div>
     """
   end
 
   def message(assigns) do
     ~H"""
-    <div class="relative flex gap-2 hover:bg-zinc-800 px-4 pt-2 pb-1 group">
-      <.user_profile user={@message.sent_by_user} size={:md} class="mt-1" online={@online} />
-      <div class="flex-1">
-        <div class="space-x-1 leading-none">
-          <.link patch={@user_detail_patch}>
-            <.username user={@message.sent_by_user} />
-          </.link>
-          <span class="text-xs text-zinc-400">
-            <%= @time %>
-          </span>
+    <div class="relative hover:bg-zinc-800 px-4 pt-2 pb-1 group">
+      <div class="flex gap-2">
+        <.user_profile user={@message.sent_by_user} size={:md} class="mt-1" online={@online} />
+        <div class="flex-1">
+          <div class="space-x-1 leading-none">
+            <.link patch={@user_detail_patch}>
+              <.username user={@message.sent_by_user} />
+            </.link>
+            <span class="text-xs text-zinc-400">
+              <%= @time %>
+            </span>
+          </div>
+          <div class="flex-1 overflow-x-hidden">
+            <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words" phx-no-format><%= linkify_text(@message.text) %></p>
+          </div>
         </div>
-        <div class="flex-1 overflow-x-hidden">
-          <p class="text-sm text-zinc-300 whitespace-pre-wrap break-words"><%= @message.text %></p>
-        </div>
+        <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
       </div>
-      <.message_hover_actions on_delete={@on_delete} on_report={@on_report} />
+      <.message_link_previews :if={@message.link_previews != []} message={@message} />
     </div>
     """
   end
@@ -322,6 +328,45 @@ defmodule LaxWeb.ChatLive.Components do
       <.icon_button icon="hero-flag" phx-click={@on_report} title="Report abuse" />
     </div>
     """
+  end
+
+  attr :message, Lax.Messages.Message, required: true
+
+  def message_link_previews(assigns) do
+    ~H"""
+    <div class="ml-10 mt-2 space-y-2">
+      <.message_link_preview
+        :for={link_preview <- @message.link_previews}
+        link_preview={link_preview}
+      />
+    </div>
+    """
+  end
+
+  attr :link_preview, Lax.Messages.LinkPreview, required: true
+
+  def message_link_preview(assigns) do
+    ~H"""
+    <div class="border-l-4 border-zinc-500 pl-4">
+      <.link href={@link_preview.link} target="_blank">
+        <p class="text-sm text-zinc-200 font-semibold">
+          <%= @link_preview.page_title %>
+        </p>
+        <p class="text-xs text-zinc-400">
+          <%= @link_preview.page_description %>
+        </p>
+        <img
+          :if={@link_preview.page_image_url}
+          class="mt-2 h-48 rounded"
+          src={@link_preview.page_image_url}
+        />
+      </.link>
+    </div>
+    """
+  end
+
+  defp linkify_text(text) do
+    Lynx.HTML.linkify_text(text, link_attrs: [target: "_blank", class: "text-sky-400"])
   end
 
   attr :form, Phoenix.HTML.Form, required: true

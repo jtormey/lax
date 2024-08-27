@@ -9,7 +9,7 @@ defmodule Lax.Messages do
       from m in Message,
         where: m.channel_id == ^channel.id,
         order_by: [desc: :inserted_at],
-        preload: [:sent_by_user]
+        preload: [:sent_by_user, :link_previews]
 
     Repo.all(query)
   end
@@ -40,6 +40,7 @@ defmodule Lax.Messages do
     |> Map.put(:sent_by_user, sent_by_user)
     |> Message.changeset(attrs)
     |> Repo.insert()
+    |> Lynx.LinkPreview.Server.submit_resource()
   end
 
   def delete!(id, user) do

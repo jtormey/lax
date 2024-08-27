@@ -1,4 +1,5 @@
 defmodule Lax.Chat do
+  alias Lax.Repo
   alias Lax.Channels
   alias Lax.Indicators
   alias Lax.Messages
@@ -85,6 +86,7 @@ defmodule Lax.Chat do
     if chat.user == nil, do: raise("User required to send message")
 
     {:ok, message} = Messages.send(chat.current_channel, chat.user, attrs)
+    message = Repo.preload(message, :link_previews)
     Messages.broadcast_sent_message(chat.current_channel, message)
 
     chat
@@ -117,12 +119,27 @@ defmodule Lax.Chat do
   def receive_sent_message(chat, message) do
     if chat.current_channel && chat.current_channel.id == message.channel_id do
       Indicators.mark_viewed(chat.user, message.channel_id)
+      Messages.LinkPreview.PubSub.subscribe_link_preview(message)
       %{chat | messages: [message | chat.messages]}
     else
       chat
     end
     |> put_latest_message_in_direct_messages()
     |> put_unread_counts()
+  end
+
+  def receive_link_preview(chat, %{resource_id: resource_id}) do
+    if chat.current_channel do
+      messages =
+        Enum.map(chat.messages, fn
+          %{id: ^resource_id} = message -> Repo.preload(message, :link_previews, force: true)
+          message -> message
+        end)
+
+      %{chat | messages: messages}
+    else
+      chat
+    end
   end
 
   def receive_deleted_message(chat, {channel_id, message_id}) do

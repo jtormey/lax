@@ -40,7 +40,7 @@ defmodule Lax.Messages.LinkPreview.PubSub do
 
   def broadcast_link_preview(link_preview = %LinkPreview{}, message) do
     topic = link_preview_topic(link_preview)
-    Phoenix.PubSub.broadcast(Lax.PubSub, topic, {:link_preview, message})
+    Phoenix.PubSub.broadcast(Lax.PubSub, topic, {:link_preview, message, link_preview})
     link_preview
   end
 

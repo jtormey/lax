@@ -333,6 +333,10 @@ defmodule LaxWeb.ChatLive do
     {:noreply, update(socket, :chat, &Chat.receive_deleted_message(&1, channel_message_ids))}
   end
 
+  def handle_info({:link_preview, :updated, link_preview}, socket) do
+    {:noreply, update(socket, :chat, &Chat.receive_link_preview(&1, link_preview))}
+  end
+
   ## Helpers
 
   def sidebar_width(nil), do: 250

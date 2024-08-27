@@ -16,6 +16,8 @@ defmodule Lax.Application do
       {Finch, name: Lax.Finch},
       # Task supervisor for sending pigeon push notifications async
       {Task.Supervisor, name: Lax.PigeonSupervisor},
+      {Lynx.LinkPreview.Server,
+       context_module: Lax.Messages, client: [strategy: Lynx.LinkPreview.OpenGraphClient]},
       # Start a worker by calling: Lax.Worker.start_link(arg)
       # {Lax.Worker, arg},
       # Start to serve requests, typically the last entry
