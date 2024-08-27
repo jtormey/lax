@@ -32,7 +32,7 @@ defmodule Lax.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:lynx, git: "git@github.com:elixir-saas/lynx.git", tag: "v0.1.2"},
+      {:lynx, git: "https://github.com/elixir-saas/lynx.git", tag: "v0.1.2"},
       {:tzdata, "~> 1.1"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.12"},
