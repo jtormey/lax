@@ -324,8 +324,8 @@ defmodule LaxWeb.ChatLive.Components do
       :if={@on_delete || @on_report}
       class="absolute top-1 right-4 hidden group-hover:flex gap-1 items-center"
     >
-      <.icon_button icon="hero-trash" phx-click={@on_delete} title="Delete message" />
-      <.icon_button icon="hero-flag" phx-click={@on_report} title="Report abuse" />
+      <.icon_button :if={@on_delete} icon="hero-trash" phx-click={@on_delete} title="Delete message" />
+      <.icon_button :if={@on_report} icon="hero-flag" phx-click={@on_report} title="Report abuse" />
     </div>
     """
   end
