@@ -121,4 +121,105 @@ defmodule Lax.Messages do
 
   def sent_messages_topic(%{id: channel_id}), do: "channel_messages:#{channel_id}"
   def sent_messages_topic(channel_id), do: "channel_messages:#{channel_id}"
+
+  alias Lax.Messages.LinkPreview
+
+  @doc """
+  Returns the list of link_preview for a particular resource.
+
+  ## Examples
+
+    iex> list_link_previews(resource)
+    [%LinkPreview{}, %LinkPreview{}]
+
+  """
+  def list_link_previews(resource = %_Schema{}) do
+    Repo.all(
+      from l in LinkPreview,
+        where: [resource_id: ^resource.id]
+    )
+  end
+
+  @doc """
+  Creates a new link_preview for a resource in a loading state.
+
+  ## Examples
+
+    iex> create_link_preview(link, resource)
+    %LinkPreview{}
+
+  """
+  def create_link_preview(link, resource = %_Schema{}) do
+    %LinkPreview{}
+    |> LinkPreview.changeset(%{link: link, resource_id: resource.id})
+    |> Repo.insert()
+    |> LinkPreview.PubSub.broadcast_link_preview(:created)
+  end
+
+  @doc """
+  Updates a link_preview when it has been successfully loaded.
+
+  ## Examples
+
+    iex> update_link_preview_loaded(link_preview, attrs)
+    %LinkPreview{}
+
+  """
+  def update_link_preview_loaded(link_preview = %LinkPreview{}, attrs) do
+    link_preview
+    |> LinkPreview.loaded_changeset(attrs)
+    |> Repo.update()
+    |> LinkPreview.PubSub.broadcast_link_preview(:updated)
+  end
+
+  @doc """
+  Updates a link_preview when it has failed to load.
+
+  ## Examples
+
+    iex> update_link_preview_failed(link_preview)
+    %LinkPreview{}
+
+  """
+  def update_link_preview_failed(link_preview = %LinkPreview{}) do
+    link_preview
+    |> LinkPreview.failed_changeset(%{})
+    |> Repo.update()
+    |> LinkPreview.PubSub.broadcast_link_preview(:updated)
+  end
+
+  @doc """
+  Deletes a link_preview.
+
+  ## Examples
+
+    iex> delete_link_preview(link_preview)
+    %LinkPreview{}
+
+  """
+  def delete_link_preview(link_preview = %LinkPreview{}) do
+    link_preview
+    |> Repo.delete()
+    |> LinkPreview.PubSub.broadcast_link_preview(:deleted)
+  end
+
+  @doc """
+  Deletes every link_preview for a resource, with the option to delete only
+  those matching specific links.
+
+  ## Examples
+
+    iex> delete_link_previews(resource)
+    %ResourceSchema{}
+
+    iex> delete_link_previews(resource, links: ["http://example.com/"])
+    %ResourceSchema{}
+
+  """
+  def delete_link_previews(resource = %_Schema{}, opts \\ []) do
+    q = from l in LinkPreview, where: [resource_id: ^resource.id]
+    q = if links = opts[:links], do: where(q, [l], l.link in ^links), else: q
+    Repo.delete_all(q)
+    resource
+  end
 end
